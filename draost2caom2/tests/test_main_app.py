@@ -83,14 +83,14 @@ TESTDATA_DIR = os.path.join(THIS_DIR, 'data')
 PLUGIN = os.path.join(os.path.dirname(THIS_DIR), '{}.py'.format(APPLICATION))
 
 
-# def pytest_generate_tests(metafunc):
-#     if os.path.exists(TESTDATA_DIR):
-#         files = [os.path.join(TESTDATA_DIR, name) for name in
-#                  os.listdir(TESTDATA_DIR) if name.endswith('header')]
-#         metafunc.parametrize('test_name', files)
+def pytest_generate_tests(metafunc):
+    if os.path.exists(TESTDATA_DIR):
+        files = [os.path.join(TESTDATA_DIR, name) for name in
+                 os.listdir(TESTDATA_DIR) if name.endswith('.tar.gz')]
+        metafunc.parametrize('test_name', files)
 
 
-@pytest.mark.parametrize('test_name', [])
+# @pytest.mark.parametrize('test_name', [])
 def test_main_app(test_name):
     basename = os.path.basename(test_name)
     product_id = basename.split('.fits')[0]
@@ -113,13 +113,13 @@ def test_main_app(test_name):
             get_file_info
 
         sys.argv = \
-            ('{} --no_validate --local {} '
+            ('{} --debug --no_validate --local {} '
              '--plugin {} --module {} --observation {} {} -o {} --lineage {}'.
              format(APPLICATION, local, plugin, plugin, COLLECTION, product_id,
                     output_file, lineage)).split()
         print(sys.argv)
         main_app()
-        obs_path = test_name.replace('header', 'xml')
+        obs_path = test_name.replace('tar.gz', 'xml')
         expected = mc.read_obs_from_file(obs_path)
         actual = mc.read_obs_from_file(output_file)
         result = get_differences(expected, actual, 'Observation')
@@ -132,8 +132,8 @@ def test_main_app(test_name):
 
 
 def _get_local(test_name):
-    prev_name = test_name.replace('.fits.header', '_prev.jpg')
-    prev_256_name = test_name.replace('.fits.header', '_prev_256.jpg')
+    prev_name = test_name.replace('.tar.gz', '_prev.jpg')
+    prev_256_name = test_name.replace('.tar.gz', '_prev_256.jpg')
     return '{} {} {}'.format(test_name, prev_name, prev_256_name)
 
 
