@@ -26,6 +26,10 @@ RUN pip install aenum && \
     pip install vos && \
     pip install xml-compare
 
+WORKDIR /usr/src/app
+
+RUN pip install jsonpickle
+
 RUN git clone https://github.com/opencadc-metadata-curation/caom2tools.git && \
   cd caom2tools && git pull origin master && \
   pip install ./caom2utils && pip install ./caom2pipe && cd ..
