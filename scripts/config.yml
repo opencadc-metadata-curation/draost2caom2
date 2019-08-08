@@ -1,7 +1,7 @@
 working_directory: /usr/src/app
-# netrc_filename: /usr/src/app/netrc
+netrc_filename: /usr/src/app/netrc
 # the proxy_file_name value must be a fully-qualified name
-proxy_file_name: /usr/src/app/cadcproxy.pem
+# proxy_file_name: /usr/src/app/cadcproxy.pem
 # operational value is ivo://cadc.nrc.ca/ams
 # test value is ivo://cadc.nrc.ca/sc2repo
 resource_id: ivo://cadc.nrc.ca/ams
