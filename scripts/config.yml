@@ -1,12 +1,14 @@
-working_directory: /usr/src/app/draost2caom2
-# the netrc_filename value must be a fully-qualified name
-netrc_filename: /usr/src/app/netrc
-# operational value is ivo://cadc.nrc.ca/caom2repo
-resource_id: ivo://cadc.nrc.ca/sc2repo
+working_directory: /usr/src/app
+# netrc_filename: /usr/src/app/netrc
+# the proxy_file_name value must be a fully-qualified name
+proxy_file_name: /usr/src/app/cadcproxy.pem
+# operational value is ivo://cadc.nrc.ca/ams
+# test value is ivo://cadc.nrc.ca/sc2repo
+resource_id: ivo://cadc.nrc.ca/ams
 todo_file_name: todo.txt
 # values True False
 use_local_files: True
-# values DEBUG INFO WARN ERROR
+# values DEBUG INFO WARNING ERROR
 logging_level: DEBUG
 # values True False
 log_to_file: True
@@ -25,13 +27,20 @@ failure_log_file_name: failure_log.txt
 #
 # this file is created in the logs directory, default is 'retries.txt'
 retry_file_name: retries.txt
+retry_failures: False
+observe_execution: True
+observable_directory: /usr/src/app/metrics
 # ad stream value - sorry
-stream: raw
+stream: default
+archive: DRAO
+collection: DRAOST
 # how to control the work that gets done
 # possible values are:
 # - scrape, store, ingest, modify, visit
 task_types: 
+  - store
   - ingest
 features:
   supports_composite: False
   use_file_names: True
+  use_urls: False
