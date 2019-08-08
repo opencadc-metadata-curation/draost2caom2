@@ -67,426 +67,244 @@
 # ***********************************************************************
 #
 
+"""Keep the structure of something that executes as main_app, so it can
+be called from the pipeline composable code, but until another archive
+loves it some JSON, leave all the JSON-specific implementation here."""
+
 import importlib
+import jsonpickle
 import logging
 import os
 import sys
 import traceback
 
-from caom2 import Observation
-from caom2utils import ObsBlueprint, get_gen_proc_arg_parser, gen_proc
+from datetime import datetime
+
+from caom2 import Observation, TypedOrderedDict, AbstractCaomEntity
+from caom2 import TypedSet, PlaneURI, Part
+from caom2utils import get_gen_proc_arg_parser
 from caom2pipe import manage_composable as mc
 from caom2pipe import execute_composable as ec
 
 
-__all__ = ['main_app', 'update', 'DraoSTName', 'COLLECTION', 'APPLICATION']
+__all__ = ['main_app', 'DraoSTName', 'COLLECTION', 'APPLICATION', 'ARCHIVE']
 
 
 APPLICATION = 'draost2caom2'
-COLLECTION = 'DRAO'
+ARCHIVE = 'DRAO'
+COLLECTION = 'DRAOST'
 
 
 class DraoSTName(ec.StorageName):
     """DRAO-ST naming rules:
     - support mixed-case file name storage, and mixed-case obs id values
-    - support uncompressed files in storage
+    - support compressed files in storage
     """
 
     DRAOST_NAME_PATTERN = '*'
 
     def __init__(self, obs_id=None, fname_on_disk=None, file_name=None):
-        self.fname_in_ad = file_name
+        obs_id = DraoSTName.get_obs_id(fname_on_disk)
         super(DraoSTName, self).__init__(
-            obs_id, COLLECTION, DraoSTName.DRAOST_NAME_PATTERN, fname_on_disk)
+            obs_id, ARCHIVE, DraoSTName.DRAOST_NAME_PATTERN, fname_on_disk,
+            mime_encoding='gzip', mime_type='application/tar+gzip')
+        self.fname_on_disk = fname_on_disk
+        self._file_name = fname_on_disk
+        self._product_id = DraoSTName.get_product_id(fname_on_disk)
+
+    @property
+    def file_uri(self):
+        """The ad URI for the file. Assumes compression."""
+        return mc.build_uri(ARCHIVE, self.file_name)
+
+    @property
+    def product_id(self):
+        return self._product_id
+
+    @product_id.setter
+    def product_id(self, value):
+        """The relationship between the observation ID of an observation, and
+        the product ID of a plane."""
+        self._product_id = value
+
+    @property
+    def file_name(self):
+        return self._file_name
+
+    @file_name.setter
+    def file_name(self, value):
+        """The relationship between the observation ID of an observation, and
+        the product ID of a plane."""
+        self._file_name = value
 
     def is_valid(self):
         return True
 
+    @staticmethod
+    def get_obs_id(f_name):
+        temp = f_name.split('_')
+        return temp[3]
 
-def accumulate_bp(bp, uri):
-    """Configure the DRAO-ST-specific ObsBlueprint at the CAOM model Observation
-    level."""
-    logging.debug('Begin accumulate_bp.')
-    # bp.configure_position_axes((1, 2))
-    # bp.configure_time_axis(3)
-    # bp.configure_energy_axis(4)
-    # bp.configure_polarization_axis(5)
-    # bp.configure_observable_axis(6)
-    bp.set('Observation.observationID', 'abc')
-    bp.set('Observation.metaRelease', '1990-01-01')
-    bp.set('Observation.type', 'TBD')
-    bp.set('Observation.intent', 'science')
+    @staticmethod
+    def get_product_id(f_name):
+        temp = f_name.split('_')
+        return '{}-{}'.format(temp[3], DraoSTName.remove_extensions(temp[5]))
 
-    bp.set('Observation.algorithm.name', 'exposure')
-
-    bp.set('Observation.telescope.name', 'Synthesis Telescope')
-    bp.set('Observation.telescope.geoLocationX', -2100330.8751700274)
-    bp.set('Observation.telescope.geoLocationY', -3694247.8244465934)
-    bp.set('Observation.telescope.geoLocationZ', 4741018.330967472)
-
-    bp.set('Observation.instrument.name', 'TBD')
-    bp.set('Observation.instrument.keywords', 'TBD')
-
-    bp.set('Observation.environment.ambientTemp', -2.5)
-
-    bp.set('Observation.proposal.id', 'proposal id')
-    bp.set('Observation.proposal.pi', 'Dr Drao')
-    bp.set('Observation.proposal.project', 'Proposal Project')
-    bp.set('Observation.proposal.title', 'Proposal Title')
-    bp.set('Observation.proposal.keywords', 'Proposal Keywords, comma separated')
-
-    bp.set('Observation.target.name', 'Target Name')
-    bp.set('Observation.target.type', 'Target Type')
-    bp.set('Observation.target.standard', 'True or False')
-    bp.set('Observation.target.redshift', 'TBD')
-    bp.set('Observation.target.keywords', 'comma separated')
-    bp.set('Observation.target.moving', 'True or False')
-
-    bp.set('Observation.target_position.point.cval1', '-1.0')
-    bp.set('Observation.target_position.point.cval2', '-1.0')
-    bp.set('Observation.target_position.coordsys', 'FK5')
-    bp.set('Observation.target_position.equinox', '2000.0')
-
-    bp.set('Plane.productID', 'TBD')
-    bp.set('Plane.metaRelease', '1990-01-01')
-    bp.set('Plane.dataRelease', '2030-01-01')
-    bp.set('Plane.dataProductType', 'image')
-    bp.set('Plane.calibrationLevel', '2')
-
-    bp.set('Plane.provenance.name', 'TBD')
-    bp.set('Plane.provenance.project', 'TBD')
-    bp.set('Plane.provenance.producer', 'DRAO')
-    bp.set('Plane.provenance.reference', 'DRAO')
-    bp.set('Plane.provenance.lastExecuted', '2018-10-31 01:23:45')
-
-    bp.set('Artifact.productType', 'science')
-    bp.set('Artifact.releaseType', 'data')
-    bp.set('Artifact.contentChecksum', 'md5:01234567890abcdef0123456789bcdef')
-    bp.set('Artifact.contentLength', 42)
-    bp.set('Artifact.contentType', 'application/gzip')
-    bp.set('Artifact.uri', 'ad:DRAO/abc.tar.gz')
-
-    import yaml
-    with open('bp.yml', 'w') as outfile:
-        yaml.dump(bp._plan, outfile, default_flow_style=False)
-    logging.debug('Done accumulate_bp.')
+    @staticmethod
+    def remove_extensions(f_name):
+        return f_name.replace('.gz', '').replace('.tar', '')
 
 
-def update(observation, **kwargs):
-    """Called to fill multiple CAOM model elements and/or attributes, must
-    have this signature for import_module loading and execution.
+class TypedOrderedDictHandler(jsonpickle.handlers.BaseHandler):
+    """The class that handles unpickling of the peculiarly CAOM-specific
+    TypedOrderedDicts"""
 
-    :param observation A CAOM Observation model instance.
-    :param **kwargs Everything else."""
-    logging.debug('Begin update.')
-    mc.check_param(observation, Observation)
-
-    headers = None
-    if 'headers' in kwargs:
-        headers = kwargs['headers']
-    fqn = None
-    if 'fqn' in kwargs:
-        fqn = kwargs['fqn']
-
-    logging.debug('Done update.')
-    return True
-
-
-def _update_typed_set(typed_set, new_set):
-    # remove the previous values
-    while len(typed_set) > 0:
-        typed_set.pop()
-    typed_set.update(new_set)
-
-
-def _build_blueprints(uri):
-    """This application relies on the caom2utils fits2caom2 ObsBlueprint
-    definition for mapping FITS file values to CAOM model element
-    attributes. This method builds the DRAO-ST blueprint for a single
-    artifact.
-
-    The blueprint handles the mapping of values with cardinality of 1:1
-    between the blueprint entries and the model attributes.
-
-    :param uri The artifact URI for the file to be processed."""
-    module = importlib.import_module(__name__)
-    blueprint = ObsBlueprint(module=module)
-    accumulate_bp(blueprint, uri)
-    blueprints = {uri: blueprint}
-    return blueprints
+    def restore(self, data):
+        result = None
+        unpickler = self.context
+        restore = unpickler.restore
+        if data['__dict__'] is not None:
+            if data['__dict__']['_oktypes'] is not None:
+                class_name = data['__dict__']['_oktypes']['py/type']
+                if class_name is not None:
+                    parts = class_name.split('.')
+                    if len(parts) != 3:
+                        raise mc.CadcException(
+                            'Unexpected class {}'.format(class_name))
+                    m = importlib.import_module(parts[0], parts[1])
+                    klass = getattr(m, parts[2].strip())
+                    result = TypedOrderedDict(klass)
+                    for k, v in data.items():
+                        if k != '__dict__' and k != 'py/object':
+                            value = restore(v, reset=False)
+                            value.key = k
+                            result.add(value)
+        return result
 
 
-def _get_uri(args):
-    result = None
-    if args.observation:
-        result = DraoSTName(args.observation[1]).file_uri
-    elif args.local:
-        obs_id = DraoSTName.remove_extensions(os.path.basename(args.local[0]))
-        result = DraoSTName(obs_id).get_file_uri()
-    elif args.lineage:
-        result = args.lineage[0].split('/', 1)[1]
+class DateTimeHandler(jsonpickle.handlers.BaseHandler):
+    """Class that handles the unpickling of datetime.datetime"""
+
+    def flatten(self, obj, data):
+        return obj.isoformat()
+
+    def restore(self, data):
+        cls, args = data['__reduce__']
+        unpickler = self.context
+        restore = unpickler.restore
+        cls = restore(cls, reset=False)
+        value = datetime.strptime(args[0], '%Y-%m-%dT%H:%M:%S.%f')
+        return value
+
+
+def _set_common(entity):
+    """Attributes that aren't in the JSON file."""
+    entity._id = AbstractCaomEntity._gen_id(fulluuid=False)
+    entity._last_modified = datetime.utcnow()
+    entity._max_last_modified = datetime.utcnow()
+    entity._meta_checksum = None
+
+
+def _build_observation(args):
+    config = mc.Config()
+    config.get_executors()
+    drao_name = _get_name(args)
+    json_fqn = '{}/{}.json'.format(config.working_directory, drao_name.obs_id)
+    if not os.path.exists(json_fqn):
+        raise mc.CadcException(
+            'Could not find {}. Cannot continue without it.'.format(json_fqn))
+
+    with open(json_fqn) as f:
+        js = f.read()
+
+    # get the skeleton of the CAOM2 observation
+    jsonpickle.handlers.register(TypedOrderedDict, TypedOrderedDictHandler)
+    jsonpickle.handlers.register(datetime, DateTimeHandler)
+    obs = jsonpickle.decode(js)
+
+    # add the bits of the CAOM2 observation that are required for a
+    # structure that's acceptable to /ams - this mostly amounts to
+    # ensuring that attributes have been defined on the 'un-pickled'
+
+    _set_common(obs)
+
+    if obs._proposal is not None:
+        if not hasattr(obs._proposal, '_project'):
+            obs._proposal._project = None
+        if not hasattr(obs._proposal, '_name'):
+            obs._proposal._name = None
+        if not hasattr(obs._proposal, '_keywords'):
+            obs._proposal._keywords = set()
+        if not hasattr(obs._proposal, '_title'):
+            obs._proposal._title = None
+    if obs._target is not None:
+        obs._target._keywords = set()
+    obs._requirements = None
+    if obs._telescope is not None:
+        obs._telescope._keywords = set()
+    if obs._instrument is not None:
+        obs._instrument._keywords = set()
+    obs._environment = None
+
+    for plane in obs.planes.values():
+        _set_common(plane)
+        plane._acc_meta_checksum = None
+        plane._metrics = None
+        plane._quality = None
+        if plane._provenance is not None:
+            plane._provenance._keywords = set()
+            plane._provenance._inputs = TypedSet(PlaneURI, )
+            # plane._provenance._last_executed = None
+        if hasattr(plane, '_position'):
+            if plane._position is not None:
+                plane._position._dimension = None
+                plane._position._resolution = None
+                plane._position._sample_size = None
+        else:
+            plane._position = None
+        if hasattr(plane, '_energy'):
+            if plane._energy is not None:
+                plane._energy._sample_size = None
+                plane._energy._bandpass_name = None
+                plane._energy._transition = None
+        else:
+            plane._energy = None
+        if not hasattr(plane, '_polarization'):
+            plane._polarization = None
+        if not hasattr(plane, '_time'):
+            plane._time = None
+        if not hasattr(plane, '_position'):
+            plane._position = None
+
+        for artifact in plane.artifacts.values():
+            _set_common(artifact)
+            artifact._acc_meta_checksum = None
+            artifact.parts = TypedOrderedDict(Part,)
+
+    if args.out_obs_xml:
+        mc.write_obs_to_file(obs, args.out_obs_xml)
+    else:
+        raise mc.CadcException(
+            'No where to write for {}'.format(obs.observation_id))
+
+
+def _get_name(args):
+    if args.local:
+        drao_name = DraoSTName(fname_on_disk=args.local[0])
     else:
         raise mc.CadcException(
             'Could not define uri from these args {}'.format(args))
-    return result
-
-
-def _build_observation():
-    """An example how to use the python caom2 library to create a
-    Synthesis Telescope observation.
-    """
-    from astropy.time import Time
-    from caom2pipe import astro_composable as ac
-    from datetime import datetime
-    from caom2 import SimpleObservation, Algorithm, ObservationIntentType
-    from caom2 import Instrument, Proposal, Target, TargetType
-    from caom2 import TargetPosition, Telescope, Environment, Plane
-    from caom2 import DataProductType, CalibrationLevel, Provenance, Metrics
-    from caom2 import DataQuality, Quality, Artifact, ProductType
-    from caom2 import ReleaseType, ChecksumURI, SegmentType, Point, Vertex
-    from caom2 import shape, Position, Energy, EnergyBand, Polarization
-    from caom2 import PolarizationState, Requirements, Status
-    from caom2 import Time as caom_Time
-
-    # collection 'DRAO' is a constant
-    #
-    # observation_id - this plus collection is the unique identifier for an
-    # CAOM2 instance, so it must be unique within all the DRAO CAOM2
-    # instances.
-    #
-    # Simple Observations have an algorithm of 'exposure'
-    # Composite Observations have an algorithm of 'composite'
-    #
-    # create Composite Observations if Simple Observations already exist,
-    # that can be named as members of the Composite Observation
-    obs = SimpleObservation(collection='DRAO',
-                            observation_id='sample_observation_id',
-                            algorithm=Algorithm(name='exposure'))
-    obs.sequence_number = 1
-    # calibration or science
-    obs.intent = ObservationIntentType.SCIENCE
-    # in FITS, the value of 'OBSTYPE' or equivalent keyword
-    obs.type = 'FIELD'
-    # TODO - what effect does this have on observation visibility in AS?
-    obs.meta_release = datetime(1990, 1, 1)
-    obs.instrument = Instrument(name='DRAO-ST')
-    obs.instrument.keywords.add('eg')
-    obs.instrument.keywords.add('shutter state')
-    obs.proposal = Proposal(id='proposal id',
-                            pi_name='John A Galt',
-                            project='Survey Name',
-                            title='Proposal ID Title')
-    obs.proposal.keywords.add('eg')
-    obs.proposal.keywords.add('low mass star formation')
-    obs.target = Target(name='MC2',
-                        target_type=TargetType.FIELD,  # or OBJECT
-                        standard=False,
-                        redshift=1.2,
-                        moving=False)
-    obs.target_position = TargetPosition(coordinates=None,
-                                         coordsys=None,
-                                         equinox=None)
-    # telescope location must be in geo-centric coordinates
-    # this is the same for all CAOM2 instances.
-    x, y, z = ac.get_location(latitude=48.320000,
-                              longitude=-119.620000,
-                              elevation=545.0)
-    obs.telescope = Telescope(name='DRAO-ST',
-                              geo_location_x=x,
-                              geo_location_y=y,
-                              geo_location_z=z)
-
-    obs.environment = Environment()
-    obs.environment.seeing = None
-    obs.environment.humidity = None
-    obs.environment.elevation = None
-    obs.environment.tau = None
-    obs.environment.wavelength_tau = None
-    obs.environment.ambient_temp = None
-    obs.environment.photometric = None
-    # do not set this field if the PI's observing goal has been met
-    obs.requirements = Requirements(flag=Status.FAIL)
-
-    # create one plane per unique thing obtained from the same photons
-    # product id must be unique within a CAOM2 instance
-    plane = Plane(product_id='1420MHz-QU',
-                  creator_id=None,
-                  meta_release=datetime(2011, 1, 1),  # public metadata
-                  data_release=datetime(2030, 1, 1),  # proprietary data
-                  data_product_type=DataProductType.IMAGE,
-                  calibration_level=CalibrationLevel.CALIBRATED)
-    plane.provenance = Provenance(name='CGPS MOSAIC',
-                                  version='42.43.44567',
-                                  project='CGPS',
-                                  producer='CGPS Consortium',
-                                  run_id='1',
-                                  reference='http://dx.doi.org/10.1086/375301',
-                                  last_executed=datetime.utcnow())
-    plane.metrics = Metrics()
-    plane.metrics.source_number_density = None
-    plane.metrics.background = None
-    plane.metrics.background_std_dev = None
-    plane.flux_density_limit = None
-    plane.mag_limit = None
-    # do not set this field if the telescope's QA assessment has passed
-    plane.quality = DataQuality(Quality.JUNK)
-
-    # build a plane.position from a CD matrix - this makes
-    # the CAOM2 instance findable from a spatial search
-    #
-    # default units are degrees
-    #   - resolution: arcsec
-    points = [Point(cval1=155.125320, cval2=15.553371),
-              Point(154.546128, 15.556190),
-              Point(154.548561, 16.114706),
-              Point(155.129357, 16.111878)]
-    vertices = [Vertex(cval1=points[0].cval1,
-                       cval2=points[0].cval2,
-                       type=SegmentType.MOVE),
-                Vertex(points[1].cval1, points[1].cval2, SegmentType.LINE),
-                Vertex(points[2].cval1, points[2].cval2, SegmentType.LINE),
-                Vertex(points[3].cval1, points[3].cval2, SegmentType.LINE),
-                Vertex(points[0].cval1, points[0].cval2, SegmentType.CLOSE)]
-    polygon = shape.Polygon(
-        points=points, samples=shape.MultiPolygon(vertices))
-    position = Position(time_dependent=False,
-                        bounds=polygon)
-    plane.position = position
-
-    # build plane.energy - makes the CAOM2 instance findable from an
-    # energy search
-    #
-    # default units are m (barycentric wavelength)
-    #   - frequency: width Hz
-    #   - frequency: sample size Hz
-    samples = [shape.SubInterval(lower=0.07427706352989176,
-                                 upper=0.15265452235324573)]
-    bounds = shape.Interval(lower=0.07427706352989176,
-                            upper=0.15265452235324573,
-                            samples=samples)
-    energy = Energy(bounds=bounds,
-                    dimension=1,  # number of pixels
-                    resolving_power=None,
-                    sample_size=0.07837745882335397,
-                    bandpass_name='S-band',
-                    em_band=EnergyBand.RADIO,
-                    transition=None,
-                    restwav=None)
-    plane.energy = energy
-
-    # build plane.polarization - makes the CAOM2 instance findable from a
-    # polarization search
-    polarization_states = [PolarizationState.I]
-    polarization = Polarization(dimension=1,
-                                polarization_states=polarization_states)
-    plane.polarization = polarization
-
-    # build plane.time - makes the CAOM2 instance findable from a time search
-    # default units are days
-    #   - exposure: seconds
-    time_data = [[Time('2009-09-07'), Time('2009-09-21')],
-                 [Time('2009-11-30'), Time('2009-12-09')],
-                 [Time('2010-02-23'), Time('2010-03-09')]]
-    for ii in range(0, 3):
-        time_data[ii][0].format = 'mjd'
-        time_data[ii][1].format = 'mjd'
-    exposure_time = time_data[2][1] - time_data[0][0]
-    samples = [shape.SubInterval(lower=float(time_data[0][0].value),
-                                 upper=float(time_data[0][1].value)),
-               shape.SubInterval(float(time_data[1][0].value),
-                                 float(time_data[1][1].value)),
-               shape.SubInterval(float(time_data[2][0].value),
-                                 float(time_data[2][1].value))]
-    bounds = shape.Interval(lower=float(time_data[0][0].value),
-                            upper=float(time_data[2][1].value),
-                            samples=samples)
-    caom_time = caom_Time(bounds=bounds,
-                          dimension=len(samples),
-                          resolution=exposure_time.to('second').value,
-                          sample_size=exposure_time.to('day').value,
-                          exposure=exposure_time.to('second').value)
-    plane.time = caom_time
-
-    # create one artifact per file
-    #
-    # ReleaseType.META means the plane.meta_release value will be used
-    # to govern the visibility of the CAOM2 instance in Advanced Search.
-    # ReleaseType.DATA means the plane.data_release value will be used
-    # to govern the visibility of the CAOM2 instance and the associated file.
-    # In the DATA case, the metadata is public.
-    #
-    # parts=None because there will be no cutout support from the tar file
-    meta = mc.get_file_meta('/tmp/sample_observation.tar.gz')
-    artifact = Artifact(uri='ad:DRAO/sample_observation.tar.gz',
-                        product_type=ProductType.SCIENCE,
-                        release_type=ReleaseType.META,
-                        content_type='application/gzip',
-                        content_length=meta['size'],
-                        content_checksum=ChecksumURI(
-                            'md5:{}'.format(meta['md5sum'])),
-                        parts=None)
-
-    plane.artifacts.add(artifact)
-    obs.planes.add(plane)
-
-    # write the observation to a file on disk in XML format, which
-    # is what the /ams service requires as input
-    mc.write_obs_to_file(obs=obs,
-                         fqn='/tmp/sample_observation.xml')
-
-    # mandatory fields are:
-    #
-    # obs.collection
-    # obs.observation_id
-    # obs.intent
-    # obs.algorithm.name
-    # obs.instrument.name
-    #
-    # obs.planes[0].product_id
-    # obs.planes[0].quality
-    #
-    # obs.planes[0].artifacts[0].uri
-    # obs.planes[0].artifacts[0].product_type
-    # obs.planes[0].artifacts[0].release_type
-    #
-    # obs.proposal is not mandatory, but if one is provided, mandatory fields
-    # are:
-    # obs.proposal.id
-    #
-    # obs.target is not mandatory, but if one is provided, mandatory fields
-    # are:
-    # obs.target.name
-    #
-    # obs.target_position is not mandatory, but if one is provided,
-    # mandatory fields are:
-    # obs.target_position.coordsys
-    # obs.target_position.coordinates
-    #
-    # obs.telescope is not mandatory, but if one is provided, mandatory fields
-    # are:
-    # obs.telescope.name
-    #
-    # obs.requirements is not mandatory, but if one is provided, mandatory
-    # fields are:
-    # obs.requirements.flag
-    #
-    # plane.provenance is not mandatory, but if one is provided, mandatory
-    # fields are:
-    # plane.provenance.name
-    #
+    return drao_name
 
 
 def main_app():
     args = get_gen_proc_arg_parser().parse_args()
     try:
-        uri = _get_uri(args)
-        blueprints = _build_blueprints(uri)
-        gen_proc(args, blueprints)
+        _build_observation(args)
     except Exception as e:
-        logging.error('Failed {} execution for {}.'.format(APPLICATION, args))
+        logging.error('Failed {} execution for {} with {}.'.format(
+            APPLICATION, args, str(e)))
         tb = traceback.format_exc()
         logging.error(tb)
         sys.exit(-1)
-
-    _build_observation()
     logging.debug('Done {} processing.'.format(APPLICATION))

@@ -66,46 +66,33 @@
 #
 # ***********************************************************************
 #
-from draost2caom2 import DraoSTName, ARCHIVE
+
+import sys
+from mock import Mock, patch
+from draost2caom2 import composable, DraoSTName
 
 
-def test_storage_name():
-    f_name = 'DRAO_ST_CGPS_RN43_20180715T1450_C21.tar.gz'
-    test_subject = DraoSTName(fname_on_disk=f_name)
-    assert test_subject.is_valid(), 'should be valid'
-    assert test_subject.obs_id == 'RN43', 'wrong obs_id'
-    assert test_subject.product_id == 'RN43-C21', 'wrong product_id'
-    assert test_subject.file_uri == 'ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong file uri'
-    assert test_subject.lineage == 'RN43-C21/ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong lineage'
+@patch('caom2pipe.execute_composable.CAOM2RepoClient')
+@patch('caom2pipe.execute_composable.CadcDataClient')
+@patch('caom2pipe.execute_composable.StoreClient')
+@patch('caom2pipe.execute_composable.LocalMetaCreateClient')
+@patch('caom2pipe.execute_composable.CaomExecute.repo_cmd_get_client')
+def test_run(read_mock, create_mock, store_mock, data_mock, repo_mock):
+    repo_mock.get_observation.return_value = None
 
-    f_name = 'DRAO_ST_CGPS_RN43_20180715T1450_C74.tar.gz'
-    test_subject = DraoSTName(fname_on_disk=f_name)
-    assert test_subject.is_valid(), 'should be valid'
-    assert test_subject.obs_id == 'RN43', 'wrong obs_id'
-    assert test_subject.product_id == 'RN43-C74', 'wrong product_id'
-    assert test_subject.file_uri == 'ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong file uri'
-    assert test_subject.lineage == 'RN43-C74/ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong lineage'
-
-    f_name = 'DRAO_ST_CGPS_RN43_20180715T1450_RAW.tar.gz'
-    test_subject = DraoSTName(fname_on_disk=f_name)
-    assert test_subject.is_valid(), 'should be valid'
-    assert test_subject.obs_id == 'RN43', 'wrong obs_id'
-    assert test_subject.product_id == 'RN43-RAW', 'wrong product_id'
-    assert test_subject.file_uri == 'ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong file uri'
-    assert test_subject.lineage == 'RN43-RAW/ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong lineage'
-
-    f_name = 'DRAO_ST_CGPS_RN43_20180715T1450_S21.tar.gz'
-    test_subject = DraoSTName(fname_on_disk=f_name)
-    assert test_subject.is_valid(), 'should be valid'
-    assert test_subject.obs_id == 'RN43', 'wrong obs_id'
-    assert test_subject.product_id == 'RN43-S21', 'wrong product_id'
-    assert test_subject.file_uri == 'ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong file uri'
-    assert test_subject.lineage == 'RN43-S21/ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong lineage'
+    sys.argv = ['test_command']
+    read_mock.return_value = None
+    composable._run()
+    assert store_mock.called, 'should have been called'
+    args, kwargs = store_mock.call_args
+    assert args[2] == 'draost2caom2', 'wrong command'
+    test_storage = args[1]
+    assert isinstance(test_storage, DraoSTName), type(test_storage)
+    assert test_storage.obs_id == 'RN43', 'obs id'
+    assert test_storage.file_name == test_storage.fname_on_disk, \
+        'wrong fname on disk'
+    assert store_mock.call_count == 4, 'wrong call count'
+    assert create_mock.called, 'create should have been called'
+    assert create_mock.call_count == 4, 'wrong call count'
+    assert repo_mock.called, 'repo mock should have been called'
+    assert data_mock.called, 'data mock should have been called'

@@ -67,45 +67,35 @@
 # ***********************************************************************
 #
 
-import tempfile
+import logging
+import sys
+import traceback
+
 
 from caom2pipe import execute_composable as ec
 from caom2pipe import manage_composable as mc
-from draost2caom2 import DraoSTName, APPLICATION, COLLECTION
+from draost2caom2 import DraoSTName, APPLICATION
 
 
 meta_visitors = []
 data_visitors = []
 
 
-def draost_run():
-    ec.run_by_file(DraoSTName, APPLICATION, COLLECTION, meta_visitors,
-                   data_visitors)
-
-
-def draost_run_proxy():
-    proxy = '/usr/src/app/cadcproxy.pem'
-    ec.run_by_file(DraoSTName, APPLICATION, COLLECTION, proxy, meta_visitors,
-                   data_visitors)
-
-
-def draost_run_single():
-    import sys
+def _run():
+    """I think this should run with use_local_files: True."""
     config = mc.Config()
     config.get_executors()
-    config.resource_id = 'ivo://cadc.nrc.ca/sc2repo'
-    if config.features.run_in_airflow:
-        temp = tempfile.NamedTemporaryFile()
-        mc.write_to_file(temp.name, sys.argv[2])
-        config.proxy = temp.name
-    else:
-        config.proxy = sys.argv[2]
-    config.stream = 'raw'
-    if config.features.use_file_names:
-        storage_name = DraoSTName(file_name=sys.argv[1])
-    else:
-        obs_id = DraoSTName.remove_extensions(sys.argv[1])
-        storage_name = DraoSTName(obs_id=obs_id)
-    result = ec.run_single(config, storage_name, APPLICATION, meta_visitors,
-                           data_visitors)
-    sys.exit(result)
+    return ec.run_by_file(config, DraoSTName, APPLICATION,
+                          meta_visitors, data_visitors, chooser=None)
+
+
+def run():
+    """Wraps _run_ in exception handling."""
+    try:
+        result = _run()
+        sys.exit(result)
+    except Exception as e:
+        logging.error(e)
+        tb = traceback.format_exc()
+        logging.debug(tb)
+        sys.exit(-1)
