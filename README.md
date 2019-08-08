@@ -3,9 +3,11 @@ Application to generate CAOM2 Observations from DRAO Synthesis Telescope FITS fi
 
 # How to run the draost2caom2 pipeline
 
-In an empty directory (the 'working directory'), on a machine with Docker installed:
+This container will find all files ending in '.gz', and will attempt to store them at CADC in the DRAO archive. This container will also look for the associated 'observationID.json' file, and will create CAOM2 records for the DRAOST collection from this metadata.
 
-1. This is the working directory, so it should probably have some space.
+In a directory (the 'working directory'), on a machine with Docker installed:
+
+1. This is the working directory, so it should be where the .gz and .json files are located.
 
 1. Set up credentials. A CADC account is required (you can request one here: 
 http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html) In this directory, create a file named 'netrc'. 
