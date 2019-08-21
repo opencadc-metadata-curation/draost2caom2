@@ -1,0 +1,1158 @@
+{
+    "py/object": "caom2.observation.SimpleObservation",
+    "_acc_meta_checksum": null,
+    "_collection": "DRAO",
+    "_observation_id": "RN43",
+    "_type": "object",
+    "_meta_release": {
+        "py/object": "datetime.datetime",
+        "__reduce__": [
+            {
+                "py/type": "datetime.datetime"
+            },
+            [
+                "2018-10-23T04:21:22.470"
+            ]
+        ]
+    },
+    "_sequence_number": {
+        "py/object": "caom2.caom_util.int_32",
+        "py/newargs": {
+            "py/tuple": [
+                1
+            ]
+        }
+    },
+    "_intent": {
+        "py/reduce": [
+            {
+                "py/type": "caom2.observation.ObservationIntentType"
+            },
+            {
+                "py/tuple": [
+                    "science"
+                ]
+            },
+            null,
+            null,
+            null
+        ]
+    },
+    "_algorithm": {
+        "py/object": "caom2.observation.Algorithm",
+        "_name": "exposure"
+    },
+    "_instrument": {
+        "py/object": "caom2.observation.Instrument",
+        "_name": "DRAO-ST"
+    },
+    "_telescope": {
+        "py/object": "caom2.observation.Telescope",
+        "_name": "DRAO-ST",
+        "_geo_location_x": -2059013.799,
+        "_geo_location_y": -3621256.97,
+        "_geo_location_z": 4814394.874
+    },
+    "_proposal": {
+        "py/object": "caom2.observation.Proposal",
+        "_id": "2017-12-02",
+        "_pi_name": "Andrew Gray"
+    },
+    "_target": {
+        "py/object": "caom2.observation.Target",
+        "_name": "UMi Dwarf",
+        "_type": {
+            "py/reduce": [
+                {
+                    "py/type": "caom2.observation.TargetType"
+                },
+                {
+                    "py/tuple": [
+                        "field"
+                    ]
+                },
+                null,
+                null,
+                null
+            ]
+        },
+        "_redshift": -0.000824,
+        "_standard": false,
+        "_moving": false
+    },
+    "_target_position": {
+        "py/object": "caom2.observation.TargetPosition",
+        "_coordinates": {
+            "py/object": "caom2.shape.Point",
+            "_cval1": 4.088084706946317,
+            "_cval2": 0.5321508889330709
+        },
+        "_equinox": 2000,
+        "_coordsys": "UTC-FK5-GEO"
+    },
+    "_planes": {
+        "py/object": "caom2.caom_util.TypedOrderedDict",
+        "__dict__": {
+            "_oktypes": {
+                "py/type": "caom2.plane.Plane"
+            }
+        },
+        "C74": {
+            "py/object": "caom2.plane.Plane",
+            "_product_id": "RN43-C74",
+            "_creator_id": "DRAO-RN43-C74",
+            "_meta_release": {
+                "py/object": "datetime.datetime",
+                "__reduce__": [
+                    {
+                        "py/type": "datetime.datetime"
+                    },
+                    [
+                        "2018-10-23T04:21:22.470"
+                    ]
+                ]
+            },
+            "_data_release": {
+                "py/object": "datetime.datetime",
+                "__reduce__": [
+                    {
+                        "py/type": "datetime.datetime"
+                    },
+                    [
+                        "2020-10-21T16:21:22.470"
+                    ]
+                ]
+            },
+            "_data_product_type": {
+                "py/reduce": [
+                    {
+                        "py/type": "caom2.plane.DataProductType"
+                    },
+                    {
+                        "py/tuple": [
+                            "image"
+                        ]
+                    },
+                    null,
+                    null,
+                    null
+                ]
+            },
+            "_calibration_level": {
+                "py/reduce": [
+                    {
+                        "py/type": "caom2.plane.CalibrationLevel"
+                    },
+                    {
+                        "py/tuple": [
+                            {
+                                "py/object": "caom2.caom_util.int_32",
+                                "py/newargs": {
+                                    "py/tuple": [
+                                        2
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    null,
+                    null,
+                    null
+                ]
+            },
+            "_provenance": {
+                "py/object": "caom2.plane.Provenance",
+                "_reference": "???",
+                "_version": "???",
+                "_run_id": 1,
+                "_last_executed": {
+                    "py/object": "datetime.datetime",
+                    "__reduce__": [
+                        {
+                            "py/type": "datetime.datetime"
+                        },
+                        [
+                            "2018-10-22T16:21:22.470"
+                        ]
+                    ]
+                },
+                "_name": "ST FIELD",
+                "_project": "DRAO ST",
+                "_producer": "DRAO"
+            },
+            "_artifacts": {
+                "py/object": "caom2.caom_util.TypedOrderedDict",
+                "__dict__": {
+                    "_oktypes": {
+                        "py/type": "caom2.artifact.Artifact"
+                    }
+                },
+                "ad:DRAO/DRAO_ST_CGPS_RN43_20180715T1450_C74.tar.gz": {
+                    "py/object": "caom2.artifact.Artifact",
+                    "_uri": "ad:DRAO/DRAO_ST_CGPS_RN43_20180715T1450_C74.tar.gz",
+                    "_product_type": {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.chunk.ProductType"
+                            },
+                            {
+                                "py/tuple": [
+                                    "science"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "_release_type": {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.artifact.ReleaseType"
+                            },
+                            {
+                                "py/tuple": [
+                                    "meta"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "_content_length": 11145570,
+                    "_content_type": "application/gzip",
+                    "_content_checksum": {
+                        "py/object": "caom2.common.ChecksumURI",
+                        "_algorithm": "md5",
+                        "_checksum": "f16f873ce14e106cff42a477b8db59e9",
+                        "_print_attributes": [
+                            "uri",
+                            "algorithm",
+                            "checksum"
+                        ],
+                        "_uri": "md5:f16f873ce14e106cff42a477b8db59e9"
+                    }
+                }
+            },
+            "_position": {
+                "py/object": "caom2.plane.Position",
+                "_time_dependent": false,
+                "_bounds": {
+                    "py/object": "caom2.shape.Circle",
+                    "_center": {
+                        "py/object": "caom2.shape.Point",
+                        "_cval1": 1.1,
+                        "_cval2": 1.1
+                    },
+                    "_radius": 1.0
+                }
+            },
+            "_time": {
+                "py/object": "caom2.plane.Time",
+                "_dimension": 12,
+                "_exposure": 1299600,
+                "_resolution": -0.1,
+                "_sample_size": -0.1,
+                "_bounds": {
+                    "py/object": "caom2.shape.Interval",
+                    "_lower": 58314.95182299707,
+                    "_upper": 58414.18151006475,
+                    "_samples": [
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58314.95182299707,
+                            "_upper": 58315.45182299707
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58322.929979527835,
+                            "_upper": 58323.429979527835
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58330.908147600945,
+                            "_upper": 58331.408147600945
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58338.8862925889,
+                            "_upper": 58339.3862925889
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58350.853527385276,
+                            "_upper": 58351.353527385276
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58358.83168391604,
+                            "_upper": 58359.33168391604
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58362.82076218119,
+                            "_upper": 58363.32076218119
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58367.80712155532,
+                            "_upper": 58368.30712155532
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58376.78253610991,
+                            "_upper": 58377.28253610991
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58380.771614375524,
+                            "_upper": 58381.271614375524
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58384.76069264067,
+                            "_upper": 58385.26069264067
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58413.68151006475,
+                            "_upper": 58414.18151006475
+                        }
+                    ]
+                }
+            },
+            "_energy": {
+                "py/object": "caom2.plane.Energy",
+                "_dimension": 1,
+                "_resolving_power": null,
+                "_restwav": 0.7347854362745098,
+                "_bounds": {
+                    "py/object": "caom2.shape.Interval",
+                    "_lower": 0.7316472434411226,
+                    "_upper": 0.7379506658461539,
+                    "_samples": [
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 0.7316472434411226,
+                            "_upper": 0.7379506658461539
+                        }
+                    ]
+                },
+                "_em_band": {
+                    "py/reduce": [
+                        {
+                            "py/type": "caom2.plane.EnergyBand"
+                        },
+                        {
+                            "py/tuple": [
+                                "Radio"
+                            ]
+                        },
+                        null,
+                        null,
+                        null
+                    ]
+                }
+            },
+            "_polarization": {
+                "py/object": "caom2.plane.Polarization",
+                "_dimension": 1,
+                "_polarization_states": [
+                    {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.plane.PolarizationState"
+                            },
+                            {
+                                "py/tuple": [
+                                    "RR"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    }
+                ]
+            }
+        },
+        "C21": {
+            "py/object": "caom2.plane.Plane",
+            "_product_id": "RN43-C21",
+            "_creator_id": "DRAO-RN43-C21",
+            "_meta_release": {
+                "py/object": "datetime.datetime",
+                "__reduce__": [
+                    {
+                        "py/type": "datetime.datetime"
+                    },
+                    [
+                        "2018-10-23T04:21:22.470"
+                    ]
+                ]
+            },
+            "_data_release": {
+                "py/object": "datetime.datetime",
+                "__reduce__": [
+                    {
+                        "py/type": "datetime.datetime"
+                    },
+                    [
+                        "2020-10-21T16:21:22.470"
+                    ]
+                ]
+            },
+            "_data_product_type": {
+                "py/reduce": [
+                    {
+                        "py/type": "caom2.plane.DataProductType"
+                    },
+                    {
+                        "py/tuple": [
+                            "image"
+                        ]
+                    },
+                    null,
+                    null,
+                    null
+                ]
+            },
+            "_calibration_level": {
+                "py/reduce": [
+                    {
+                        "py/type": "caom2.plane.CalibrationLevel"
+                    },
+                    {
+                        "py/tuple": [
+                            {
+                                "py/object": "caom2.caom_util.int_32",
+                                "py/newargs": {
+                                    "py/tuple": [
+                                        2
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    null,
+                    null,
+                    null
+                ]
+            },
+            "_provenance": {
+                "py/object": "caom2.plane.Provenance",
+                "_reference": "???",
+                "_version": "???",
+                "_run_id": 1,
+                "_last_executed": {
+                    "py/object": "datetime.datetime",
+                    "__reduce__": [
+                        {
+                            "py/type": "datetime.datetime"
+                        },
+                        [
+                            "2018-10-22T16:21:22.470"
+                        ]
+                    ]
+                },
+                "_name": "ST FIELD",
+                "_project": "DRAO ST",
+                "_producer": "DRAO"
+            },
+            "_artifacts": {
+                "py/object": "caom2.caom_util.TypedOrderedDict",
+                "__dict__": {
+                    "_oktypes": {
+                        "py/type": "caom2.artifact.Artifact"
+                    }
+                },
+                "ad:DRAO/DRAO_ST_CGPS_RN43_20180715T1450_C21.tar.gz": {
+                    "py/object": "caom2.artifact.Artifact",
+                    "_uri": "ad:DRAO/DRAO_ST_CGPS_RN43_20180715T1450_C21.tar.gz",
+                    "_product_type": {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.chunk.ProductType"
+                            },
+                            {
+                                "py/tuple": [
+                                    "science"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "_release_type": {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.artifact.ReleaseType"
+                            },
+                            {
+                                "py/tuple": [
+                                    "meta"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "_content_length": 56612204,
+                    "_content_type": "application/gzip",
+                    "_content_checksum": {
+                        "py/object": "caom2.common.ChecksumURI",
+                        "_algorithm": "md5",
+                        "_checksum": "84026c0b8a3b53965e5fee5b570eff3e",
+                        "_print_attributes": [
+                            "uri",
+                            "algorithm",
+                            "checksum"
+                        ],
+                        "_uri": "md5:84026c0b8a3b53965e5fee5b570eff3e"
+                    }
+                }
+            },
+            "_position": {
+                "py/object": "caom2.plane.Position",
+                "_time_dependent": false,
+                "_bounds": {
+                    "py/object": "caom2.shape.Circle",
+                    "_center": {
+                        "py/object": "caom2.shape.Point",
+                        "_cval1": 1.1,
+                        "_cval2": 1.1
+                    },
+                    "_radius": 1.0
+                }
+            },
+            "_time": {
+                "py/object": "caom2.plane.Time",
+                "_dimension": 12,
+                "_exposure": 1299600,
+                "_resolution": -0.1,
+                "_sample_size": -0.1,
+                "_bounds": {
+                    "py/object": "caom2.shape.Interval",
+                    "_lower": 58314.95182299707,
+                    "_upper": 58414.18151006475,
+                    "_samples": [
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58314.95182299707,
+                            "_upper": 58315.45182299707
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58322.929979527835,
+                            "_upper": 58323.429979527835
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58330.908147600945,
+                            "_upper": 58331.408147600945
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58338.8862925889,
+                            "_upper": 58339.3862925889
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58350.853527385276,
+                            "_upper": 58351.353527385276
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58358.83168391604,
+                            "_upper": 58359.33168391604
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58362.82076218119,
+                            "_upper": 58363.32076218119
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58367.80712155532,
+                            "_upper": 58368.30712155532
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58376.78253610991,
+                            "_upper": 58377.28253610991
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58380.771614375524,
+                            "_upper": 58381.271614375524
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58384.76069264067,
+                            "_upper": 58385.26069264067
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58413.68151006475,
+                            "_upper": 58414.18151006475
+                        }
+                    ]
+                }
+            },
+            "_energy": {
+                "py/object": "caom2.plane.Energy",
+                "_dimension": 2,
+                "_resolving_power": null,
+                "_restwav": 0.21112144929577464,
+                "_bounds": {
+                    "py/object": "caom2.shape.Interval",
+                    "_lower": 0.20746882906574393,
+                    "_upper": 0.21490498781362008,
+                    "_samples": [
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 0.20852806507228333,
+                            "_upper": 0.21063831620461249
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 0.21154274711504706,
+                            "_upper": 0.2137207146762624
+                        }
+                    ]
+                },
+                "_em_band": {
+                    "py/reduce": [
+                        {
+                            "py/type": "caom2.plane.EnergyBand"
+                        },
+                        {
+                            "py/tuple": [
+                                "Radio"
+                            ]
+                        },
+                        null,
+                        null,
+                        null
+                    ]
+                }
+            },
+            "_polarization": {
+                "py/object": "caom2.plane.Polarization",
+                "_dimension": 4,
+                "_polarization_states": [
+                    {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.plane.PolarizationState"
+                            },
+                            {
+                                "py/tuple": [
+                                    "RR"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.plane.PolarizationState"
+                            },
+                            {
+                                "py/tuple": [
+                                    "LL"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.plane.PolarizationState"
+                            },
+                            {
+                                "py/tuple": [
+                                    "RL"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.plane.PolarizationState"
+                            },
+                            {
+                                "py/tuple": [
+                                    "LR"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    }
+                ]
+            }
+        },
+        "S21": {
+            "py/object": "caom2.plane.Plane",
+            "_product_id": "RN43-S21",
+            "_creator_id": "DRAO-RN43-S21",
+            "_meta_release": {
+                "py/object": "datetime.datetime",
+                "__reduce__": [
+                    {
+                        "py/type": "datetime.datetime"
+                    },
+                    [
+                        "2018-10-23T04:21:22.470"
+                    ]
+                ]
+            },
+            "_data_release": {
+                "py/object": "datetime.datetime",
+                "__reduce__": [
+                    {
+                        "py/type": "datetime.datetime"
+                    },
+                    [
+                        "2020-10-21T16:21:22.470"
+                    ]
+                ]
+            },
+            "_data_product_type": {
+                "py/reduce": [
+                    {
+                        "py/type": "caom2.plane.DataProductType"
+                    },
+                    {
+                        "py/tuple": [
+                            "image"
+                        ]
+                    },
+                    null,
+                    null,
+                    null
+                ]
+            },
+            "_calibration_level": {
+                "py/reduce": [
+                    {
+                        "py/type": "caom2.plane.CalibrationLevel"
+                    },
+                    {
+                        "py/tuple": [
+                            {
+                                "py/object": "caom2.caom_util.int_32",
+                                "py/newargs": {
+                                    "py/tuple": [
+                                        2
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    null,
+                    null,
+                    null
+                ]
+            },
+            "_provenance": {
+                "py/object": "caom2.plane.Provenance",
+                "_reference": "???",
+                "_version": "???",
+                "_run_id": 1,
+                "_last_executed": {
+                    "py/object": "datetime.datetime",
+                    "__reduce__": [
+                        {
+                            "py/type": "datetime.datetime"
+                        },
+                        [
+                            "2018-10-22T16:21:22.470"
+                        ]
+                    ]
+                },
+                "_name": "ST FIELD",
+                "_project": "DRAO ST",
+                "_producer": "DRAO"
+            },
+            "_artifacts": {
+                "py/object": "caom2.caom_util.TypedOrderedDict",
+                "__dict__": {
+                    "_oktypes": {
+                        "py/type": "caom2.artifact.Artifact"
+                    }
+                },
+                "ad:DRAO/DRAO_ST_CGPS_RN43_20180715T1450_S21.tar.gz": {
+                    "py/object": "caom2.artifact.Artifact",
+                    "_uri": "ad:DRAO/DRAO_ST_CGPS_RN43_20180715T1450_S21.tar.gz",
+                    "_product_type": {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.chunk.ProductType"
+                            },
+                            {
+                                "py/tuple": [
+                                    "science"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "_release_type": {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.artifact.ReleaseType"
+                            },
+                            {
+                                "py/tuple": [
+                                    "meta"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "_content_length": 780004134,
+                    "_content_type": "application/gzip",
+                    "_content_checksum": {
+                        "py/object": "caom2.common.ChecksumURI",
+                        "_algorithm": "md5",
+                        "_checksum": "c4d90f3276817f5c01f8d9465d9e7466",
+                        "_print_attributes": [
+                            "uri",
+                            "algorithm",
+                            "checksum"
+                        ],
+                        "_uri": "md5:c4d90f3276817f5c01f8d9465d9e7466"
+                    }
+                }
+            },
+            "_position": {
+                "py/object": "caom2.plane.Position",
+                "_time_dependent": false,
+                "_bounds": {
+                    "py/object": "caom2.shape.Circle",
+                    "_center": {
+                        "py/object": "caom2.shape.Point",
+                        "_cval1": 1.1,
+                        "_cval2": 1.1
+                    },
+                    "_radius": 1.0
+                }
+            },
+            "_time": {
+                "py/object": "caom2.plane.Time",
+                "_dimension": 12,
+                "_exposure": 1299600,
+                "_resolution": -0.1,
+                "_sample_size": -0.1,
+                "_bounds": {
+                    "py/object": "caom2.shape.Interval",
+                    "_lower": 58314.95182299707,
+                    "_upper": 58414.18151006475,
+                    "_samples": [
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58314.95182299707,
+                            "_upper": 58315.45182299707
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58322.929979527835,
+                            "_upper": 58323.429979527835
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58330.908147600945,
+                            "_upper": 58331.408147600945
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58338.8862925889,
+                            "_upper": 58339.3862925889
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58350.853527385276,
+                            "_upper": 58351.353527385276
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58358.83168391604,
+                            "_upper": 58359.33168391604
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58362.82076218119,
+                            "_upper": 58363.32076218119
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58367.80712155532,
+                            "_upper": 58368.30712155532
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58376.78253610991,
+                            "_upper": 58377.28253610991
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58380.771614375524,
+                            "_upper": 58381.271614375524
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58384.76069264067,
+                            "_upper": 58385.26069264067
+                        },
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 58413.68151006475,
+                            "_upper": 58414.18151006475
+                        }
+                    ]
+                }
+            },
+            "_energy": {
+                "py/object": "caom2.plane.Energy",
+                "_dimension": 4,
+                "_resolving_power": null,
+                "_restwav": 0.21112144929577464,
+                "_bounds": {
+                    "py/object": "caom2.shape.Interval",
+                    "_lower": 0.21104713692361846,
+                    "_upper": 0.2111958140190208,
+                    "_samples": [
+                        {
+                            "py/object": "caom2.shape.SubInterval",
+                            "_lower": 0.21104713692361846,
+                            "_upper": 0.2111958140190208
+                        }
+                    ]
+                },
+                "_em_band": {
+                    "py/reduce": [
+                        {
+                            "py/type": "caom2.plane.EnergyBand"
+                        },
+                        {
+                            "py/tuple": [
+                                "Radio"
+                            ]
+                        },
+                        null,
+                        null,
+                        null
+                    ]
+                }
+            },
+            "_polarization": {
+                "py/object": "caom2.plane.Polarization",
+                "_dimension": 2,
+                "_polarization_states": [
+                    {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.plane.PolarizationState"
+                            },
+                            {
+                                "py/tuple": [
+                                    "RR"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.plane.PolarizationState"
+                            },
+                            {
+                                "py/tuple": [
+                                    "LL"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    }
+                ]
+            }
+        },
+        "RAW": {
+            "py/object": "caom2.plane.Plane",
+            "_product_id": "RN43-RAW",
+            "_creator_id": "DRAO-RN43-RAW",
+            "_meta_release": {
+                "py/object": "datetime.datetime",
+                "__reduce__": [
+                    {
+                        "py/type": "datetime.datetime"
+                    },
+                    [
+                        "2018-10-23T04:21:22.470"
+                    ]
+                ]
+            },
+            "_data_release": {
+                "py/object": "datetime.datetime",
+                "__reduce__": [
+                    {
+                        "py/type": "datetime.datetime"
+                    },
+                    [
+                        "2020-10-21T16:21:22.470"
+                    ]
+                ]
+            },
+            "_data_product_type": {
+                "py/reduce": [
+                    {
+                        "py/type": "caom2.plane.DataProductType"
+                    },
+                    {
+                        "py/tuple": [
+                            "image"
+                        ]
+                    },
+                    null,
+                    null,
+                    null
+                ]
+            },
+            "_calibration_level": {
+                "py/reduce": [
+                    {
+                        "py/type": "caom2.plane.CalibrationLevel"
+                    },
+                    {
+                        "py/tuple": [
+                            {
+                                "py/object": "caom2.caom_util.int_32",
+                                "py/newargs": {
+                                    "py/tuple": [
+                                        2
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    null,
+                    null,
+                    null
+                ]
+            },
+            "_provenance": {
+                "py/object": "caom2.plane.Provenance",
+                "_reference": "???",
+                "_version": "???",
+                "_run_id": 1,
+                "_last_executed": {
+                    "py/object": "datetime.datetime",
+                    "__reduce__": [
+                        {
+                            "py/type": "datetime.datetime"
+                        },
+                        [
+                            "2018-10-22T16:21:22.470"
+                        ]
+                    ]
+                },
+                "_name": "ST FIELD",
+                "_project": "DRAO ST",
+                "_producer": "DRAO"
+            },
+            "_artifacts": {
+                "py/object": "caom2.caom_util.TypedOrderedDict",
+                "__dict__": {
+                    "_oktypes": {
+                        "py/type": "caom2.artifact.Artifact "
+                    }
+                },
+                "ad:DRAO/DRAO_ST_CGPS_RN43_20180715T1450_RAW.tar.gz": {
+                    "py/object": "caom2.artifact.Artifact",
+                    "_uri": "ad:DRAO/DRAO_ST_CGPS_RN43_20180715T1450_RAW.tar.gz",
+                    "_product_type": {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.chunk.ProductType"
+                            },
+                            {
+                                "py/tuple": [
+                                    "science"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "_release_type": {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.artifact.ReleaseType"
+                            },
+                            {
+                                "py/tuple": [
+                                    "meta"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "_content_length": 860988441,
+                    "_content_type": "application/gzip",
+                    "_content_checksum": {
+                        "py/object": "caom2.common.ChecksumURI",
+                        "_algorithm": "md5",
+                        "_checksum": "b8667fa877b5b0b3996a75427751d2fb",
+                        "_print_attributes": [
+                            "uri",
+                            "algorithm",
+                            "checksum"
+                        ],
+                        "_uri": "md5:b8667fa877b5b0b3996a75427751d2fb"
+                    }
+                }
+            },
+            "_position": {
+                "py/object": "caom2.plane.Position",
+                "_time_dependent": false,
+                "_bounds": {
+                    "py/object": "caom2.shape.Circle",
+                    "_center": {
+                        "py/object": "caom2.shape.Point",
+                        "_cval1": 1.1,
+                        "_cval2": 1.1
+                    },
+                    "_radius": 1.0
+                }
+            }
+        }
+    }
+}

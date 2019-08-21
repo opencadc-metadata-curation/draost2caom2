@@ -1,0 +1,84 @@
+    "_planes": {
+        "py/object": "caom2.caom_util.TypedOrderedDict",
+        "1420MHz-QU": {
+            "py/object": "caom2.plane.Plane",
+            "_acc_meta_checksum": null,
+            "_artifacts": {
+                "py/object": "caom2.caom_util.TypedOrderedDict",
+                "ad:DRAO/sample_observation.tar.gz": {
+                    "py/object": "caom2.artifact.Artifact",
+                    "_acc_meta_checksum": null,
+                    "_content_checksum": {
+                        "py/object": "caom2.common.ChecksumURI",
+                        "_algorithm": "md5",
+                        "_checksum": "d41d8cd98f00b204e9800998ecf8427e",
+                        "_print_attributes": [
+                            "uri",
+                            "algorithm",
+                            "checksum"
+                        ],
+                        "_uri": "md5:d41d8cd98f00b204e9800998ecf8427e"
+                    },
+                    "_content_length": 0,
+                    "_content_type": "application/gzip",
+                    "_id": {
+                        "py/object": "uuid.UUID",
+                        "hex": "00000000000000009340ca29d7731b91"
+                    },
+                    "_last_modified": null,
+                    "_max_last_modified": null,
+                    "_meta_checksum": null,
+                    "_parts": {
+                        "py/object": "caom2.caom_util.TypedOrderedDict",
+                        "__dict__": {
+                            "_oktypes": {
+                                "py/type": "caom2.part.Part"
+                            }
+                        }
+                    },
+                    "_product_type": {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.chunk.ProductType"
+                            },
+                            {
+                                "py/tuple": [
+                                    "science"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "_release_type": {
+                        "py/reduce": [
+                            {
+                                "py/type": "caom2.artifact.ReleaseType"
+                            },
+                            {
+                                "py/tuple": [
+                                    "meta"
+                                ]
+                            },
+                            null,
+                            null,
+                            null
+                        ]
+                    },
+                    "_uri": "ad:DRAO/sample_observation.tar.gz"
+                },
+                "__dict__": {
+                    "_oktypes": {
+                        "py/type": "caom2.artifact.Artifact"
+                    }
+                }
+            },
+            "_product_id": "1420MHz-QU",
+        },
+        "__dict__": {
+            "_oktypes": {
+                "py/type": "caom2.plane.Plane"
+            }
+        }
+    },
