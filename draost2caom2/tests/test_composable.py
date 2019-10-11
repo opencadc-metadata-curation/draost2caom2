@@ -67,9 +67,13 @@
 # ***********************************************************************
 #
 
+import os
 import sys
 from mock import Mock, patch
 from draost2caom2 import composable, DraoSTName
+
+THIS_DIR = os.path.dirname(os.path.realpath(__file__))
+TEST_DATA_DIR = os.path.join(THIS_DIR, 'data')
 
 
 @patch('caom2pipe.execute_composable.CAOM2RepoClient')
@@ -79,20 +83,25 @@ from draost2caom2 import composable, DraoSTName
 @patch('caom2pipe.execute_composable.CaomExecute.repo_cmd_get_client')
 def test_run(read_mock, create_mock, store_mock, data_mock, repo_mock):
     repo_mock.get_observation.return_value = None
+    getcwd_orig = os.getcwd
+    os.getcwd = Mock(return_value=THIS_DIR)
 
-    sys.argv = ['test_command']
-    read_mock.return_value = None
-    composable._run()
-    assert store_mock.called, 'should have been called'
-    args, kwargs = store_mock.call_args
-    assert args[2] == 'draost2caom2', 'wrong command'
-    test_storage = args[1]
-    assert isinstance(test_storage, DraoSTName), type(test_storage)
-    assert test_storage.obs_id == 'RN43', 'obs id'
-    assert test_storage.file_name == test_storage.fname_on_disk, \
-        'wrong fname on disk'
-    assert store_mock.call_count == 4, 'wrong call count'
-    assert create_mock.called, 'create should have been called'
-    assert create_mock.call_count == 4, 'wrong call count'
-    assert repo_mock.called, 'repo mock should have been called'
-    assert data_mock.called, 'data mock should have been called'
+    try:
+        sys.argv = ['test_command']
+        read_mock.return_value = None
+        composable._run()
+        assert store_mock.called, 'store mock should have been called'
+        args, kwargs = store_mock.call_args
+        assert args[2] == 'draost2caom2', 'wrong command'
+        test_storage = args[1]
+        assert isinstance(test_storage, DraoSTName), type(test_storage)
+        assert test_storage.obs_id == 'RN43', 'obs id'
+        assert test_storage.file_name == test_storage.fname_on_disk, \
+            'wrong fname on disk'
+        assert store_mock.call_count == 4, 'wrong call count'
+        assert create_mock.called, 'create should have been called'
+        assert create_mock.call_count == 4, 'wrong call count'
+        assert repo_mock.called, 'repo mock should have been called'
+        assert data_mock.called, 'data mock should have been called'
+    finally:
+        os.getcwd = getcwd_orig

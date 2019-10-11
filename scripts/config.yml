@@ -4,7 +4,7 @@ netrc_filename: /usr/src/app/netrc
 # proxy_file_name: /usr/src/app/cadcproxy.pem
 # operational value is ivo://cadc.nrc.ca/ams
 # test value is ivo://cadc.nrc.ca/sc2repo
-resource_id: ivo://cadc.nrc.ca/ams
+resource_id: ivo://cadc.nrc.ca/sc2repo
 todo_file_name: todo.txt
 # values True False
 use_local_files: True
@@ -33,7 +33,7 @@ observable_directory: /usr/src/app/metrics
 # ad stream value - sorry
 stream: default
 archive: DRAO
-collection: DRAOST
+collection: DRAO
 # how to control the work that gets done
 # possible values are:
 # - scrape, store, ingest, modify, visit

@@ -92,7 +92,7 @@ __all__ = ['main_app', 'DraoSTName', 'COLLECTION', 'APPLICATION', 'ARCHIVE']
 
 APPLICATION = 'draost2caom2'
 ARCHIVE = 'DRAO'
-COLLECTION = 'DRAOST'
+COLLECTION = 'DRAO'
 
 
 class DraoSTName(ec.StorageName):
@@ -197,9 +197,13 @@ class DateTimeHandler(jsonpickle.handlers.BaseHandler):
         return value
 
 
-def _set_common(entity):
+def _set_common(entity, existing):
     """Attributes that aren't in the JSON file."""
-    entity._id = AbstractCaomEntity._gen_id(fulluuid=False)
+    if existing is None:
+        entity._id = AbstractCaomEntity._gen_id(fulluuid=False)
+    else:
+        # handle updates - need the existing id
+        entity._id = existing._id
     entity._last_modified = datetime.utcnow()
     entity._max_last_modified = datetime.utcnow()
     entity._meta_checksum = None
@@ -208,8 +212,13 @@ def _set_common(entity):
 def _build_observation(args):
     config = mc.Config()
     config.get_executors()
-    drao_name = _get_name(args)
-    json_fqn = '{}/{}.json'.format(config.working_directory, drao_name.obs_id)
+
+    existing = None
+    if args.in_obs_xml:
+        existing = mc.read_obs_from_file(args.in_obs_xml.name)
+
+    drao_name, drao_dir = _get_name(args)
+    json_fqn = '{}/{}.json'.format(drao_dir, drao_name.obs_id)
     if not os.path.exists(json_fqn):
         raise mc.CadcException(
             'Could not find {}. Cannot continue without it.'.format(json_fqn))
@@ -226,7 +235,7 @@ def _build_observation(args):
     # structure that's acceptable to /ams - this mostly amounts to
     # ensuring that attributes have been defined on the 'un-pickled'
 
-    _set_common(obs)
+    _set_common(obs, existing)
 
     if obs._proposal is not None:
         if not hasattr(obs._proposal, '_project'):
@@ -247,7 +256,10 @@ def _build_observation(args):
     obs._environment = None
 
     for plane in obs.planes.values():
-        _set_common(plane)
+        if existing is not None:
+            _set_common(plane, existing.planes[plane.product_id])
+        else:
+            _set_common(plane, None)
         plane._acc_meta_checksum = None
         plane._metrics = None
         plane._quality = None
@@ -277,7 +289,12 @@ def _build_observation(args):
             plane._position = None
 
         for artifact in plane.artifacts.values():
-            _set_common(artifact)
+            if existing is not None:
+                _set_common(
+                    artifact,
+                    existing.planes[plane.product_id].artifacts[artifact.uri])
+            else:
+                _set_common(artifact, None)
             artifact._acc_meta_checksum = None
             artifact.parts = TypedOrderedDict(Part,)
 
@@ -290,11 +307,12 @@ def _build_observation(args):
 
 def _get_name(args):
     if args.local:
-        drao_name = DraoSTName(fname_on_disk=args.local[0])
+        drao_name = DraoSTName(fname_on_disk=os.path.basename(args.local[0]))
+        drao_dir = os.path.dirname(args.local[0])
     else:
         raise mc.CadcException(
             'Could not define uri from these args {}'.format(args))
-    return drao_name
+    return drao_name, drao_dir
 
 
 def main_app():
