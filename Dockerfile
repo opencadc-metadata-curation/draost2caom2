@@ -17,7 +17,9 @@ RUN pip install aenum && \
     pip install astropy && \
     pip install cadcdata && \
     pip install cadctap && \
+    pip install caom2 && \
     pip install caom2repo && \
+    pip install caom2utils && \
     pip install funcsigs && \
     pip install future && \
     pip install numpy && \
@@ -30,9 +32,8 @@ WORKDIR /usr/src/app
 
 RUN pip install jsonpickle
 
-RUN git clone https://github.com/opencadc-metadata-curation/caom2tools.git && \
-  cd caom2tools && git pull origin master && \
-  pip install ./caom2utils && pip install ./caom2pipe && cd ..
+RUN git clone https://github.com/opencadc-metadata-curation/caom2pipe.git && \
+  git pull origin master && pip install ./caom2pipe
 
 RUN git clone https://github.com/opencadc-metadata-curation/draost2caom2.git && \
   cp ./draost2caom2/scripts/config.yml / && \
