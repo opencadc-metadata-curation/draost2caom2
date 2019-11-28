@@ -80,11 +80,10 @@ import traceback
 
 from datetime import datetime
 
-from caom2 import Observation, TypedOrderedDict, AbstractCaomEntity
+from caom2 import TypedOrderedDict, AbstractCaomEntity
 from caom2 import TypedSet, PlaneURI, Part
 from caom2utils import get_gen_proc_arg_parser
 from caom2pipe import manage_composable as mc
-from caom2pipe import execute_composable as ec
 
 
 __all__ = ['main_app', 'DraoSTName', 'COLLECTION', 'APPLICATION', 'ARCHIVE']
@@ -95,7 +94,7 @@ ARCHIVE = 'DRAO'
 COLLECTION = 'DRAO'
 
 
-class DraoSTName(ec.StorageName):
+class DraoSTName(mc.StorageName):
     """DRAO-ST naming rules:
     - support mixed-case file name storage, and mixed-case obs id values
     - support compressed files in storage
