@@ -3,6 +3,7 @@ FROM opencadc/astropy
 RUN apk --no-cache add \
     bash \
     coreutils \
+    g++ \
     git
 
 RUN pip install cadcdata && \
@@ -10,6 +11,8 @@ RUN pip install cadcdata && \
     pip install caom2 && \
     pip install caom2repo && \
     pip install caom2utils && \
+    pip install ftputil && \
+    pip install pytz && \
     pip install PyYAML && \
     pip install spherical-geometry && \
     pip install vos
