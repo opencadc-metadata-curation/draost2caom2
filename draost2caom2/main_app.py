@@ -246,6 +246,16 @@ def _build_observation(args):
         if not hasattr(obs._proposal, '_title'):
             obs._proposal._title = None
     if obs._target is not None:
+        if not hasattr(obs._target, '_target_type'):
+            obs._target._target_type = None
+        if not hasattr(obs._target, '_standard'):
+            obs._target._standard = None
+        if not hasattr(obs._target, '_redshift'):
+            obs._target._redshift = None
+        if not hasattr(obs._target, '_moving'):
+            obs._target._moving = None
+        if not hasattr(obs._target, '_target_id'):
+            obs._target._target_id = None
         obs._target._keywords = set()
     obs._requirements = None
     if obs._telescope is not None:
