@@ -275,6 +275,8 @@ def _build_observation(args):
         if plane._provenance is not None:
             plane._provenance._keywords = set()
             plane._provenance._inputs = TypedSet(PlaneURI, )
+            if not hasattr(plane._provenance, '_run_id'):
+                plane._provenance._run_id = None
             # plane._provenance._last_executed = None
         if hasattr(plane, '_position'):
             if plane._position is not None:
@@ -285,14 +287,23 @@ def _build_observation(args):
             plane._position = None
         if hasattr(plane, '_energy'):
             if plane._energy is not None:
-                plane._energy._sample_size = None
-                plane._energy._bandpass_name = None
-                plane._energy._transition = None
+                if not hasattr(plane._energy, '_sample_size'):
+                    plane._energy._sample_size = None
+                if not hasattr(plane._energy, '_bandpass_name'):
+                    plane._energy._bandpass_name = None
+                if not hasattr(plane._energy, '_transition'):
+                    plane._energy._transition = None
+                if not hasattr(plane._energy, '_resolving_power'):
+                    plane._energy._resolving_power = None
         else:
             plane._energy = None
         if not hasattr(plane, '_polarization'):
             plane._polarization = None
-        if not hasattr(plane, '_time'):
+        if hasattr(plane, '_time'):
+            if plane._time is not None:
+                if not hasattr(plane._time, '_resolution'):
+                    plane._time._resolution = None
+        else:
             plane._time = None
         if not hasattr(plane, '_position'):
             plane._position = None
