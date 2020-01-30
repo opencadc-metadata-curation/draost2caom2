@@ -106,7 +106,7 @@ class DraoSTName(mc.StorageName):
         obs_id = DraoSTName.get_obs_id(fname_on_disk)
         super(DraoSTName, self).__init__(
             obs_id, ARCHIVE, DraoSTName.DRAOST_NAME_PATTERN, fname_on_disk,
-            mime_encoding='gzip', mime_type='application/tar+gzip')
+            mime_encoding='gzip', mime_type='application/x-tar')
         self.fname_on_disk = fname_on_disk
         self._file_name = fname_on_disk
         self._product_id = DraoSTName.get_product_id(fname_on_disk)
