@@ -71,6 +71,7 @@ from draost2caom2 import main_app, DraoSTName, APPLICATION, COLLECTION
 from caom2.diff import get_differences
 from caom2pipe import manage_composable as mc
 
+import glob
 import os
 import sys
 
@@ -78,21 +79,23 @@ THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 TEST_DATA_DIR = os.path.join(THIS_DIR, 'data')
 
 
-def test_main_app():
-    test_name = os.path.join('{}/{}'.format(
-        TEST_DATA_DIR, 'DRAO_ST_CGPS_RN43_20180715T1450_C21.tar.gz'))
+def pytest_generate_tests(metafunc):
+    test_list = glob.glob(f'{TEST_DATA_DIR}/*.json')
+    metafunc.parametrize('test_name', test_list)
+
+
+def test_main_app(test_name):
     basename = os.path.basename(test_name)
     drao_name = DraoSTName(fname_on_disk=basename)
-    output_file = '{}.actual.xml'.format(test_name)
+    output_file = f'{drao_name.obs_id}.actual.xml'
 
     sys.argv = \
-        ('{} --debug --no_validate --local {} --observation {} {} -o {} '
-         '--lineage {}'.
-         format(APPLICATION, test_name, COLLECTION, drao_name.obs_id,
-                output_file, drao_name.lineage)).split()
+        (f'{APPLICATION} --debug --no_validate --local {test_name} '
+         f'--observation {COLLECTION} {drao_name.obs_id} -o {output_file} '
+         f'--lineage {drao_name.lineage}').split()
     print(sys.argv)
     main_app()
-    obs_path = '{}/{}'.format(TEST_DATA_DIR, 'RN43.xml')
+    obs_path = f'{TEST_DATA_DIR}/{drao_name.obs_id}.xml'
     expected = mc.read_obs_from_file(obs_path)
     actual = mc.read_obs_from_file(output_file)
     result = get_differences(expected, actual, 'Observation')

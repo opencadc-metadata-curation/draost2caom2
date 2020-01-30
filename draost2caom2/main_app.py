@@ -71,6 +71,7 @@
 be called from the pipeline composable code, but until another archive
 loves it some JSON, leave all the JSON-specific implementation here."""
 
+import glob
 import importlib
 import jsonpickle
 import logging
@@ -98,6 +99,9 @@ class DraoSTName(mc.StorageName):
     """DRAO-ST naming rules:
     - support mixed-case file name storage, and mixed-case obs id values
     - support compressed files in storage
+
+    Remove the majority of the naming handling, because that all arrives
+    via the json file from DRAO.
     """
 
     DRAOST_NAME_PATTERN = '*'
@@ -108,50 +112,49 @@ class DraoSTName(mc.StorageName):
             obs_id, ARCHIVE, DraoSTName.DRAOST_NAME_PATTERN, fname_on_disk,
             mime_encoding='gzip', mime_type='application/x-tar')
         self.fname_on_disk = fname_on_disk
-        self._file_name = fname_on_disk
-        self._product_id = DraoSTName.get_product_id(fname_on_disk)
+        self._f_names_on_disk = None
 
     @property
     def file_uri(self):
         """The ad URI for the file. Assumes compression."""
-        return mc.build_uri(ARCHIVE, self.file_name)
+        return None
 
     @property
     def product_id(self):
-        return self._product_id
-
-    @product_id.setter
-    def product_id(self, value):
-        """The relationship between the observation ID of an observation, and
-        the product ID of a plane."""
-        self._product_id = value
+        return None
 
     @property
     def file_name(self):
-        return self._file_name
+        return None
 
-    @file_name.setter
-    def file_name(self, value):
-        """The relationship between the observation ID of an observation, and
-        the product ID of a plane."""
-        self._file_name = value
+    @property
+    def lineage(self):
+        return None
 
     def is_valid(self):
+        return self.fname_on_disk.endswith('.json')
+
+    def is_multi(self):
         return True
+
+    def multiple_files(self, config):
+        self.get_f_names(config)
+        return self._f_names_on_disk
+
+    def get_f_names(self, config):
+        # pattern agreed on with DDR on slack, 29-01-20
+        temp = glob.glob(
+            f'{config.working_directory}/DRAO_ST_*_{self._obs_id}_*.tar.gz')
+        self._f_names_on_disk = sorted([os.path.basename(ii) for ii in temp])
 
     @staticmethod
     def get_obs_id(f_name):
-        temp = f_name.split('_')
-        return temp[3]
-
-    @staticmethod
-    def get_product_id(f_name):
-        temp = f_name.split('_')
-        return '{}-{}'.format(temp[3], DraoSTName.remove_extensions(temp[5]))
+        return DraoSTName.remove_extensions(f_name)
 
     @staticmethod
     def remove_extensions(f_name):
-        return f_name.replace('.gz', '').replace('.tar', '')
+        return f_name.replace('.gz', '').replace('.tar', '').replace(
+            '.json', '')
 
 
 class TypedOrderedDictHandler(jsonpickle.handlers.BaseHandler):

@@ -66,46 +66,28 @@
 #
 # ***********************************************************************
 #
+
+from caom2pipe import manage_composable as mc
 from draost2caom2 import DraoSTName, ARCHIVE
 
 
 def test_storage_name():
-    f_name = 'DRAO_ST_CGPS_RN43_20180715T1450_C21.tar.gz'
+    d_name1 = 'DRAO_ST_CGPS_RN43_20180715T1450_C21.tar.gz'
+    d_name2 = 'DRAO_ST_CGPS_RN43_20180715T1450_C74.tar.gz'
+    d_name3 = 'DRAO_ST_CGPS_RN43_20180715T1450_RAW.tar.gz'
+    d_name4 = 'DRAO_ST_CGPS_RN43_20180715T1450_S21.tar.gz'
+    test_f_names = sorted([d_name1, d_name2, d_name3,
+                           d_name4])
+    f_name = 'RN43.json'
     test_subject = DraoSTName(fname_on_disk=f_name)
     assert test_subject.is_valid(), 'should be valid'
     assert test_subject.obs_id == 'RN43', 'wrong obs_id'
-    assert test_subject.product_id == 'RN43-C21', 'wrong product_id'
-    assert test_subject.file_uri == 'ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong file uri'
-    assert test_subject.lineage == 'RN43-C21/ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong lineage'
-
-    f_name = 'DRAO_ST_CGPS_RN43_20180715T1450_C74.tar.gz'
-    test_subject = DraoSTName(fname_on_disk=f_name)
-    assert test_subject.is_valid(), 'should be valid'
-    assert test_subject.obs_id == 'RN43', 'wrong obs_id'
-    assert test_subject.product_id == 'RN43-C74', 'wrong product_id'
-    assert test_subject.file_uri == 'ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong file uri'
-    assert test_subject.lineage == 'RN43-C74/ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong lineage'
-
-    f_name = 'DRAO_ST_CGPS_RN43_20180715T1450_RAW.tar.gz'
-    test_subject = DraoSTName(fname_on_disk=f_name)
-    assert test_subject.is_valid(), 'should be valid'
-    assert test_subject.obs_id == 'RN43', 'wrong obs_id'
-    assert test_subject.product_id == 'RN43-RAW', 'wrong product_id'
-    assert test_subject.file_uri == 'ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong file uri'
-    assert test_subject.lineage == 'RN43-RAW/ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong lineage'
-
-    f_name = 'DRAO_ST_CGPS_RN43_20180715T1450_S21.tar.gz'
-    test_subject = DraoSTName(fname_on_disk=f_name)
-    assert test_subject.is_valid(), 'should be valid'
-    assert test_subject.obs_id == 'RN43', 'wrong obs_id'
-    assert test_subject.product_id == 'RN43-S21', 'wrong product_id'
-    assert test_subject.file_uri == 'ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong file uri'
-    assert test_subject.lineage == 'RN43-S21/ad:{}/{}'.format(
-        ARCHIVE, f_name), 'wrong lineage'
+    assert test_subject.product_id is None, 'not maintained by pipeline'
+    assert test_subject.file_uri is None, 'not maintained by pipeline'
+    assert test_subject.lineage is None, 'not maintained by pipeline'
+    test_config = mc.Config()
+    test_config.get_executors()
+    test_subject.get_f_names(test_config)
+    assert test_subject.is_multi, 'expect multi'
+    assert test_subject.multiple_files(test_config) == test_f_names, \
+        'two ways to name'
