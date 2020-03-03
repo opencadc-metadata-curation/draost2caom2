@@ -71,7 +71,6 @@
 be called from the pipeline composable code, but until another archive
 loves it some JSON, leave all the JSON-specific implementation here."""
 
-import glob
 import importlib
 import jsonpickle
 import logging
@@ -85,76 +84,13 @@ from caom2 import TypedOrderedDict, AbstractCaomEntity
 from caom2 import TypedSet, PlaneURI, Part
 from caom2utils import get_gen_proc_arg_parser
 from caom2pipe import manage_composable as mc
+from draost2caom2 import draost_name
 
 
-__all__ = ['main_app', 'DraoSTName', 'COLLECTION', 'APPLICATION', 'ARCHIVE']
+__all__ = ['draost_main_app', 'APPLICATION', 'to_caom2']
 
 
 APPLICATION = 'draost2caom2'
-ARCHIVE = 'DRAO'
-COLLECTION = 'DRAO'
-
-
-class DraoSTName(mc.StorageName):
-    """DRAO-ST naming rules:
-    - support mixed-case file name storage, and mixed-case obs id values
-    - support compressed files in storage
-
-    Remove the majority of the naming handling, because that all arrives
-    via the json file from DRAO.
-    """
-
-    DRAOST_NAME_PATTERN = '*'
-
-    def __init__(self, obs_id=None, fname_on_disk=None, file_name=None):
-        obs_id = DraoSTName.get_obs_id(fname_on_disk)
-        super(DraoSTName, self).__init__(
-            obs_id, ARCHIVE, DraoSTName.DRAOST_NAME_PATTERN, fname_on_disk,
-            mime_encoding='gzip', mime_type='application/x-tar')
-        self.fname_on_disk = fname_on_disk
-        self._f_names_on_disk = None
-
-    @property
-    def file_uri(self):
-        """The ad URI for the file. Assumes compression."""
-        return None
-
-    @property
-    def product_id(self):
-        return None
-
-    @property
-    def file_name(self):
-        return None
-
-    @property
-    def lineage(self):
-        return None
-
-    def is_valid(self):
-        return self.fname_on_disk.endswith('.json')
-
-    def is_multi(self):
-        return True
-
-    def multiple_files(self, config):
-        self.get_f_names(config)
-        return self._f_names_on_disk
-
-    def get_f_names(self, config):
-        # pattern agreed on with DDR on slack, 29-01-20
-        temp = glob.glob(
-            f'{config.working_directory}/DRAO_ST_*_{self._obs_id}_*.tar.gz')
-        self._f_names_on_disk = sorted([os.path.basename(ii) for ii in temp])
-
-    @staticmethod
-    def get_obs_id(f_name):
-        return DraoSTName.remove_extensions(f_name)
-
-    @staticmethod
-    def remove_extensions(f_name):
-        return f_name.replace('.gz', '').replace('.tar', '').replace(
-            '.json', '')
 
 
 class TypedOrderedDictHandler(jsonpickle.handlers.BaseHandler):
@@ -172,7 +108,7 @@ class TypedOrderedDictHandler(jsonpickle.handlers.BaseHandler):
                     parts = class_name.split('.')
                     if len(parts) != 3:
                         raise mc.CadcException(
-                            'Unexpected class {}'.format(class_name))
+                            f'Unexpected class {class_name}')
                     m = importlib.import_module(parts[0], parts[1])
                     klass = getattr(m, parts[2].strip())
                     result = TypedOrderedDict(klass)
@@ -220,10 +156,11 @@ def _build_observation(args):
         existing = mc.read_obs_from_file(args.in_obs_xml.name)
 
     drao_name, drao_dir = _get_name(args)
-    json_fqn = '{}/{}.json'.format(drao_dir, drao_name.obs_id)
+    json_fqn = f'{drao_dir}/{drao_name.obs_id}.json'
+    logging.error(f'Looking for metadata in {json_fqn}')
     if not os.path.exists(json_fqn):
         raise mc.CadcException(
-            'Could not find {}. Cannot continue without it.'.format(json_fqn))
+            f'Could not find {json_fqn}. Cannot continue without it.')
 
     with open(json_fqn) as f:
         js = f.read()
@@ -298,6 +235,9 @@ def _build_observation(args):
                     plane._energy._transition = None
                 if not hasattr(plane._energy, '_resolving_power'):
                     plane._energy._resolving_power = None
+                if hasattr(plane._energy, '_em_band'):
+                    plane._energy.energy_bands = None
+                    plane._energy.energy_bands.add(plane._energy._em_band)
         else:
             plane._energy = None
         if not hasattr(plane, '_polarization'):
@@ -324,28 +264,35 @@ def _build_observation(args):
     if args.out_obs_xml:
         mc.write_obs_to_file(obs, args.out_obs_xml)
     else:
-        raise mc.CadcException(
-            'No where to write for {}'.format(obs.observation_id))
+        raise mc.CadcException(f'No where to write for {obs.observation_id}')
+    return 0
 
 
 def _get_name(args):
     if args.local:
-        drao_name = DraoSTName(fname_on_disk=os.path.basename(args.local[0]))
+        drao_name = draost_name.DraoSTName(
+            fname_on_disk=os.path.basename(args.local[0]))
         drao_dir = os.path.dirname(args.local[0])
     else:
-        raise mc.CadcException(
-            'Could not define uri from these args {}'.format(args))
+        raise mc.CadcException(f'Could not define uri from these args {args}')
     return drao_name, drao_dir
 
 
-def main_app():
+def to_caom2():
+    args = get_gen_proc_arg_parser().parse_args()
+    result = _build_observation(args)
+    logging.debug(f'Done {APPLICATION} processing.')
+    return result
+
+
+def draost_main_app():
     args = get_gen_proc_arg_parser().parse_args()
     try:
-        _build_observation(args)
+        result = to_caom2()
+        sys.exit(result)
     except Exception as e:
-        logging.error('Failed {} execution for {} with {}.'.format(
-            APPLICATION, args, str(e)))
+        logging.error(
+            f'Failed {APPLICATION} execution for {args} with {str(e)}.')
         tb = traceback.format_exc()
         logging.error(tb)
         sys.exit(-1)
-    logging.debug('Done {} processing.'.format(APPLICATION))

@@ -3,7 +3,7 @@
 # ******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
 # *************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
 #
-#  (c) 2018.                            (c) 2018.
+#  (c) 2020.                            (c) 2020.
 #  Government of Canada                 Gouvernement du Canada
 #  National Research Council            Conseil national de recherches
 #  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -67,29 +67,16 @@
 # ***********************************************************************
 #
 
-import logging
-import sys
-import traceback
+from caom2pipe import name_builder_composable as nbc
+from draost2caom2 import draost_name
 
 
-from caom2pipe import run_composable as rc
-from draost2caom2 import draost_builder, main_app
+class DraoSTBuilder(nbc.StorageNameInstanceBuilder):
 
+    def __init__(self):
+        super(DraoSTBuilder).__init__()
 
-def _run():
-    """I think this should run with use_local_files: True."""
-    builder = draost_builder.DraoSTBuilder()
-    return rc.run_by_todo(command_name=main_app.APPLICATION,
-                          name_builder=builder)
-
-
-def run():
-    """Wraps _run_ in exception handling."""
-    try:
-        result = _run()
-        sys.exit(result)
-    except Exception as e:
-        logging.error(e)
-        tb = traceback.format_exc()
-        logging.debug(tb)
-        sys.exit(-1)
+    def build(self, entry):
+        import logging
+        logging.error(f'builder {entry}')
+        return draost_name.DraoSTName(fname_on_disk=entry)

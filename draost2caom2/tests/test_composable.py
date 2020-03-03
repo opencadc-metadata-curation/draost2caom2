@@ -79,9 +79,11 @@ TEST_DATA_DIR = os.path.join(THIS_DIR, 'data')
 @patch('caom2pipe.execute_composable.CAOM2RepoClient')
 @patch('caom2pipe.execute_composable.CadcDataClient')
 @patch('caom2pipe.execute_composable.CaomExecute._cadc_data_put_client')
-@patch('caom2pipe.execute_composable.LocalMetaCreateClient')
+@patch('caom2pipe.execute_composable.LocalMetaCreateDirect')
 @patch('caom2pipe.execute_composable.CaomExecute.repo_cmd_get_client')
 def test_run(read_mock, create_mock, store_mock, data_mock, repo_mock):
+    data_mock.return_value.get_file_info.side_effect = \
+        _mock_get_file_info
     repo_mock.get_observation.return_value = None
     getcwd_orig = os.getcwd
     os.getcwd = Mock(return_value=THIS_DIR)
@@ -89,8 +91,10 @@ def test_run(read_mock, create_mock, store_mock, data_mock, repo_mock):
     try:
         sys.argv = ['test_command']
         read_mock.return_value = None
-        composable._run()
-        assert store_mock.called, 'store mock should have been called'
+        test_result = composable._run()
+        assert test_result == 0, 'wrong test result'
+        assert create_mock.called, 'create should have been called'
+        assert create_mock.call_count == 2, 'wrong call count'
         args, kwargs = create_mock.call_args
         assert args[2] == 'draost2caom2', 'wrong command'
         test_storage = args[1]
@@ -98,11 +102,13 @@ def test_run(read_mock, create_mock, store_mock, data_mock, repo_mock):
         assert test_storage.obs_id in ['RN43', 'A0'], 'obs id'
         assert test_storage.fname_on_disk in ['RN43.json', 'A0.json'], \
             'wrong fname on disk'
-        assert test_storage.is_multi, 'needs to be multi'
+        assert store_mock.called, 'store mock should have been called'
         assert store_mock.call_count == 4, 'wrong call count'
-        assert create_mock.called, 'create should have been called'
-        assert create_mock.call_count == 2, 'wrong call count'
         assert repo_mock.called, 'repo mock should have been called'
         assert data_mock.called, 'data mock should have been called'
     finally:
         os.getcwd = getcwd_orig
+
+
+def _mock_get_file_info(archive, file_id):
+    return {'name': file_id, 'type': 'application/x-tar'}

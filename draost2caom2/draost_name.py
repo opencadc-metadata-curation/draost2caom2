@@ -3,7 +3,7 @@
 # ******************  CANADIAN ASTRONOMY DATA CENTRE  *******************
 # *************  CENTRE CANADIEN DE DONNÉES ASTRONOMIQUES  **************
 #
-#  (c) 2018.                            (c) 2018.
+#  (c) 2020.                            (c) 2020.
 #  Government of Canada                 Gouvernement du Canada
 #  National Research Council            Conseil national de recherches
 #  Ottawa, Canada, K1A 0R6              Ottawa, Canada, K1A 0R6
@@ -67,29 +67,80 @@
 # ***********************************************************************
 #
 
+import glob
 import logging
-import sys
-import traceback
+import os
+
+from caom2pipe import manage_composable as mc
+
+__all__ = ['COLLECTION', 'ARCHIVE', 'DraoSTName']
+
+ARCHIVE = 'DRAO'
+COLLECTION = 'DRAO'
 
 
-from caom2pipe import run_composable as rc
-from draost2caom2 import draost_builder, main_app
+class DraoSTName(mc.StorageName):
+    """DRAO-ST naming rules:
+    - support mixed-case file name storage, and mixed-case obs id values
+    - support compressed files in storage
 
+    Remove the majority of the naming handling, because that all arrives
+    via the json file from DRAO.
+    """
 
-def _run():
-    """I think this should run with use_local_files: True."""
-    builder = draost_builder.DraoSTBuilder()
-    return rc.run_by_todo(command_name=main_app.APPLICATION,
-                          name_builder=builder)
+    DRAOST_NAME_PATTERN = '*'
 
+    def __init__(self, obs_id=None, fname_on_disk=None, file_name=None):
+        obs_id = DraoSTName.get_obs_id(fname_on_disk)
+        super(DraoSTName, self).__init__(
+            obs_id, ARCHIVE, DraoSTName.DRAOST_NAME_PATTERN, fname_on_disk,
+            mime_encoding='gzip', mime_type='application/x-tar')
+        self.fname_on_disk = fname_on_disk
+        self._f_names_on_disk = None
+        self._logger = logging.getLogger(__name__)
+        self._logger.debug(self)
 
-def run():
-    """Wraps _run_ in exception handling."""
-    try:
-        result = _run()
-        sys.exit(result)
-    except Exception as e:
-        logging.error(e)
-        tb = traceback.format_exc()
-        logging.debug(tb)
-        sys.exit(-1)
+    def __str__(self):
+        return f'obs id {self.obs_id} file names {self._f_names_on_disk}'
+
+    @property
+    def file_uri(self):
+        """The ad URI for the file. Assumes compression."""
+        return None
+
+    @property
+    def product_id(self):
+        return None
+
+    @property
+    def file_name(self):
+        return None
+
+    @property
+    def lineage(self):
+        return None
+
+    def is_valid(self):
+        return self.fname_on_disk.endswith('.json')
+
+    def multiple_files(self, work_dir_fqn):
+        self._f_names_on_disk = DraoSTName.get_f_names(
+            self.obs_id, work_dir_fqn)
+        self._logger.debug(self)
+        return self._f_names_on_disk
+
+    @staticmethod
+    def get_f_names(obs_id, work_dir_fqn):
+        # pattern agreed on with DDR on slack, 29-01-20
+        temp = glob.glob(
+            f'{work_dir_fqn}/DRAO_ST_*_{obs_id}_*.tar.gz')
+        return sorted([os.path.basename(ii) for ii in temp])
+
+    @staticmethod
+    def get_obs_id(f_name):
+        return DraoSTName.remove_extensions(f_name)
+
+    @staticmethod
+    def remove_extensions(f_name):
+        return f_name.replace('.gz', '').replace('.tar', '').replace(
+            '.json', '')

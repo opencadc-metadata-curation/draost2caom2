@@ -67,7 +67,9 @@
 # ***********************************************************************
 #
 
-from draost2caom2 import main_app, DraoSTName, APPLICATION, COLLECTION
+from draost2caom2 import to_caom2, APPLICATION
+from draost2caom2.draost_name import COLLECTION
+from draost2caom2 import draost_name
 from caom2.diff import get_differences
 from caom2pipe import manage_composable as mc
 
@@ -86,7 +88,7 @@ def pytest_generate_tests(metafunc):
 
 def test_main_app(test_name):
     basename = os.path.basename(test_name)
-    drao_name = DraoSTName(fname_on_disk=basename)
+    drao_name = draost_name.DraoSTName(fname_on_disk=basename)
     output_file = f'{drao_name.obs_id}.actual.xml'
 
     sys.argv = \
@@ -94,7 +96,7 @@ def test_main_app(test_name):
          f'--observation {COLLECTION} {drao_name.obs_id} -o {output_file} '
          f'--lineage {drao_name.lineage}').split()
     print(sys.argv)
-    main_app()
+    to_caom2()
     obs_path = f'{TEST_DATA_DIR}/{drao_name.obs_id}.xml'
     expected = mc.read_obs_from_file(obs_path)
     actual = mc.read_obs_from_file(output_file)

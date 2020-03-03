@@ -68,7 +68,7 @@
 #
 
 from caom2pipe import manage_composable as mc
-from draost2caom2 import DraoSTName, ARCHIVE
+from draost2caom2 import draost_name
 
 
 def test_storage_name():
@@ -79,7 +79,7 @@ def test_storage_name():
     test_f_names = sorted([d_name1, d_name2, d_name3,
                            d_name4])
     f_name = 'RN43.json'
-    test_subject = DraoSTName(fname_on_disk=f_name)
+    test_subject = draost_name.DraoSTName(fname_on_disk=f_name)
     assert test_subject.is_valid(), 'should be valid'
     assert test_subject.obs_id == 'RN43', 'wrong obs_id'
     assert test_subject.product_id is None, 'not maintained by pipeline'
@@ -87,7 +87,7 @@ def test_storage_name():
     assert test_subject.lineage is None, 'not maintained by pipeline'
     test_config = mc.Config()
     test_config.get_executors()
-    test_subject.get_f_names(test_config)
-    assert test_subject.is_multi, 'expect multi'
-    assert test_subject.multiple_files(test_config) == test_f_names, \
+    test_result = draost_name.DraoSTName.get_f_names(
+        test_subject.obs_id, test_config.working_directory)
+    assert test_result == test_f_names, \
         'two ways to name'
