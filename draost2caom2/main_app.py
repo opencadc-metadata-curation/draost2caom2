@@ -204,12 +204,21 @@ def _build_observation(args):
         obs._instrument._keywords = set()
     obs._environment = None
 
+    if not hasattr(obs, '_meta_read_groups'):
+        obs._meta_read_groups = None
+
     for plane in obs.planes.values():
         if existing is not None:
             _set_common(plane, existing.planes[plane.product_id])
         else:
             _set_common(plane, None)
         plane._acc_meta_checksum = None
+
+        if not hasattr(plane, '_data_read_groups'):
+            plane._data_read_groups = None
+        if not hasattr(plane, '_meta_read_groups'):
+            plane._meta_read_groups = None
+
         plane._metrics = None
         plane._quality = None
         if plane._provenance is not None:
@@ -223,6 +232,9 @@ def _build_observation(args):
                 plane._position._dimension = None
                 plane._position._resolution = None
                 plane._position._sample_size = None
+
+            if not hasattr(plane._position, '_resolution_bounds'):
+                plane._position._resolution_bounds = None
         else:
             plane._position = None
         if hasattr(plane, '_energy'):
@@ -235,6 +247,9 @@ def _build_observation(args):
                     plane._energy._transition = None
                 if not hasattr(plane._energy, '_resolving_power'):
                     plane._energy._resolving_power = None
+                if not hasattr(plane._energy, '_resolving_power_bounds'):
+                    plane._energy._resolving_power_bounds = None
+
                 if hasattr(plane._energy, '_em_band'):
                     plane._energy.energy_bands = None
                     plane._energy.energy_bands.add(plane._energy._em_band)
@@ -246,10 +261,14 @@ def _build_observation(args):
             if plane._time is not None:
                 if not hasattr(plane._time, '_resolution'):
                     plane._time._resolution = None
+                if not hasattr(plane._time, '_resolution_bounds'):
+                    plane._time._resolution_bounds = None
         else:
             plane._time = None
         if not hasattr(plane, '_position'):
             plane._position = None
+        if not hasattr(plane, '_custom'):
+            plane._custom = None
 
         for artifact in plane.artifacts.values():
             if existing is not None:
@@ -260,6 +279,10 @@ def _build_observation(args):
                 _set_common(artifact, None)
             artifact._acc_meta_checksum = None
             artifact.parts = TypedOrderedDict(Part,)
+            if not hasattr(artifact, '_content_release'):
+                artifact._content_release = None
+            if not hasattr(artifact, '_content_read_groups'):
+                artifact._content_read_groups = None
 
     if args.out_obs_xml:
         mc.write_obs_to_file(obs, args.out_obs_xml)
