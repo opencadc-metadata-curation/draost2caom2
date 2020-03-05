@@ -70,7 +70,6 @@
 from draost2caom2 import to_caom2, APPLICATION
 from draost2caom2.draost_name import COLLECTION
 from draost2caom2 import draost_name
-from caom2.diff import get_differences
 from caom2pipe import manage_composable as mc
 
 import glob
@@ -98,12 +97,7 @@ def test_main_app(test_name):
     print(sys.argv)
     to_caom2()
     obs_path = f'{TEST_DATA_DIR}/{drao_name.obs_id}.xml'
-    expected = mc.read_obs_from_file(obs_path)
-    actual = mc.read_obs_from_file(output_file)
-    result = get_differences(expected, actual, 'Observation')
-    if result:
-        msg = 'Differences found in observation {}\n{}'. \
-            format(expected.observation_id, '\n'.join(
-                [r for r in result]))
-        raise AssertionError(msg)
+    test_result = mc.compare_observations(output_file, obs_path)
+    if test_result is not None:
+        raise AssertionError(test_result)
     # assert False  # cause I want to see logging messages

@@ -67,9 +67,12 @@
 # ***********************************************************************
 #
 
+import os
+
 from caom2pipe import manage_composable as mc
 from draost2caom2 import draost_name
 
+TEST_FILES_DIR = '/test_files'
 
 def test_storage_name():
     d_name1 = 'DRAO_ST_CGPS_RN43_20180715T1450_C21.tar.gz'
@@ -87,6 +90,13 @@ def test_storage_name():
     assert test_subject.lineage is None, 'not maintained by pipeline'
     test_config = mc.Config()
     test_config.get_executors()
+    test_config.working_directory = TEST_FILES_DIR
+    for ii in test_f_names:
+        f_name = f'{TEST_FILES_DIR}/{ii}'
+        if not os.path.exists(f_name):
+            with open(f_name, 'w') as f:
+                f.write('test content')
+
     test_result = draost_name.DraoSTName.get_f_names(
         test_subject.obs_id, test_config.working_directory)
     assert test_result == test_f_names, \
