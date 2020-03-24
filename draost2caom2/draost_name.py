@@ -122,7 +122,7 @@ class DraoSTName(mc.StorageName):
 
     @property
     def file_name(self):
-        return None
+        return self.fname_on_disk
 
     @property
     def lineage(self):

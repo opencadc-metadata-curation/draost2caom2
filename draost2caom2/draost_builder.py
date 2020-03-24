@@ -77,6 +77,4 @@ class DraoSTBuilder(nbc.StorageNameInstanceBuilder):
         super(DraoSTBuilder).__init__()
 
     def build(self, entry):
-        import logging
-        logging.error(f'builder {entry}')
         return draost_name.DraoSTName(fname_on_disk=entry)
