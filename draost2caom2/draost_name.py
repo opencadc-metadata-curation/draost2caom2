@@ -86,6 +86,14 @@ class DraoSTName(mc.StorageName):
 
     Remove the majority of the naming handling, because that all arrives
     via the json file from DRAO.
+
+    From Pat, slack 29-01-20:
+    As for which: in the past we left it up to the operation to figure out
+    and do handle decompression as necessary... I would go with
+    application/x-tar in CAOM and when interacting with storage I would
+    expect content-type=application/x-tar and content-encoding=gzip to
+    provide the correct details in a consistent way.... I cannot recommend
+    relying on [libmagic].
     """
 
     DRAOST_NAME_PATTERN = '*'

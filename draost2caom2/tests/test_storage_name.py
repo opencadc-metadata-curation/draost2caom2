@@ -74,6 +74,7 @@ from draost2caom2 import draost_name
 
 TEST_FILES_DIR = '/test_files'
 
+
 def test_storage_name():
     d_name1 = 'DRAO_ST_CGPS_RN43_20180715T1450_C21.tar.gz'
     d_name2 = 'DRAO_ST_CGPS_RN43_20180715T1450_C74.tar.gz'
