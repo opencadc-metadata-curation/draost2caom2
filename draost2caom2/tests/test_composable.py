@@ -68,12 +68,11 @@
 #
 
 import os
-import sys
 from mock import Mock, patch
 from draost2caom2 import composable, DraoSTName
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
-TEST_DATA_DIR = os.path.join(THIS_DIR, 'data')
+TEST_FILES_DIR = '/test_files'
 
 
 @patch('caom2pipe.execute_composable.CAOM2RepoClient')
@@ -82,6 +81,9 @@ TEST_DATA_DIR = os.path.join(THIS_DIR, 'data')
 @patch('caom2pipe.execute_composable.LocalMetaCreateDirect')
 @patch('caom2pipe.execute_composable.CaomExecute.repo_cmd_get_client')
 def test_run(read_mock, create_mock, store_mock, data_mock, repo_mock):
+
+    # the tar.gz and .json files need to be in /test_files for this to work
+
     data_mock.return_value.get_file_info.side_effect = \
         _mock_get_file_info
     repo_mock.get_observation.return_value = None
@@ -89,7 +91,6 @@ def test_run(read_mock, create_mock, store_mock, data_mock, repo_mock):
     os.getcwd = Mock(return_value=THIS_DIR)
 
     try:
-        sys.argv = ['test_command']
         read_mock.return_value = None
         test_result = composable._run()
         assert test_result == 0, 'wrong test result'

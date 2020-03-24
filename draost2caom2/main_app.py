@@ -81,7 +81,7 @@ import traceback
 from datetime import datetime
 
 from caom2 import TypedOrderedDict, AbstractCaomEntity
-from caom2 import TypedSet, PlaneURI, Part
+from caom2 import TypedSet, PlaneURI, Part, EnergyBand, caom_util
 from caom2utils import get_gen_proc_arg_parser
 from caom2pipe import manage_composable as mc
 from draost2caom2 import draost_name
@@ -251,7 +251,7 @@ def _build_observation(args):
                     plane._energy._resolving_power_bounds = None
 
                 if hasattr(plane._energy, '_em_band'):
-                    plane._energy.energy_bands = None
+                    plane._energy.energy_bands = caom_util.TypedSet(EnergyBand)
                     plane._energy.energy_bands.add(plane._energy._em_band)
         else:
             plane._energy = None
