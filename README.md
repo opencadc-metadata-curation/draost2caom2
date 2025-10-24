@@ -37,7 +37,7 @@ from data. This file should have content that looks like the following:
 1. Get the script that executes the pipeline by doing the following:
 
    ```
-   wget https://raw.github.com/opencadc/draost2caom2/master/scripts/draost_run.sh
+   wget https://raw.github.com/opencadc-metadata-curation/draost2caom2/master/scripts/draost_run.sh
    ```
 
 1. Ensure the script is executable:
